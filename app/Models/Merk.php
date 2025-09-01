@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Constants\MerkColumns;
 
 class Merk extends Model
 {
+    use HasFactory;    
     protected $table;
     protected $fillable = ['merk'];
     protected $primaryKey = 'id';
@@ -18,8 +20,8 @@ class Merk extends Model
         parent::__construct($attributes);
 
         // Tetapkan nama tabel dan kolom
-        $this->table = config('db_constants.table.merk');
-        $this->fillable = array_values(config('db_constants.column.merk') ?? []);
+        $this->table = config('db_tables.merk');
+        $this->fillable = MerkColumns::getFillable();
     }
 
     public static function updateMerk($id, array $data)

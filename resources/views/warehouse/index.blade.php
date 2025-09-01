@@ -372,8 +372,9 @@
                                 <th>Warehouse Name</th>
                                 <th>Warehouse Address</th>
                                 <th>Warehouse Telephone</th>
-                                <th>is rm warehouse</th>
-                                <th>is fg warehouse</th>
+                                <th>RM Warehouse</th>
+                                <th>FG Warehouse</th>
+                                <th>Status</th>
                                 <th>Created At</th>
                                 <th>Updated At</th>
                                 <th>Actions</th>
@@ -385,9 +386,22 @@
                                     <td>{{ $index + 1}} </td>
                                     <td>{{ $item->warehouse_name }}</td>
                                     <td>{{ $item->warehouse_address }}</td>
-                                    <td>{{ $item->warehouse_telephone }}</td>
-                                    <td>{{ $item->is_rm_whouse }}</td>
-                                    <td>{{ $item->is_fg_whouse }}</td>
+                                    <td>{{ $item->warehouse_phone }}</td>
+                                    <td>
+                                        <span class="badge {{ $item->is_rm_warehouse ? 'bg-success' : 'bg-secondary' }}">
+                                            {{ $item->is_rm_warehouse ? 'Yes' : 'No' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $item->is_fg_warehouse ? 'bg-success' : 'bg-secondary' }}">
+                                            {{ $item->is_fg_warehouse ? 'Yes' : 'No' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $item->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </td>
                                     <td>{{ $item->created_at }}</td>
                                     <td>{{ $item->updated_at }}</td>
                                       <td>
@@ -408,7 +422,7 @@
                                     </td>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center">No data available in table</td>
+                                    <td colspan="10" class="text-center">No data available in table</td>
                                 </tr>
                             @endforelse
     

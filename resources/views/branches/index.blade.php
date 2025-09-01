@@ -438,7 +438,7 @@
                             <tr>
                             <td>{{ $branch->id }}</td>
                             <td>
-                                <a href="{{ route('branch.detail', ['id' => $branch->id]) }}">
+                                <a href="{{ route('branch.detail', ['id' => $branch->id]) }}" style="color: inherit; text-decoration: none;">
                                     {{ $branch->branch_name }}
                                 </a>
                             </td>

@@ -49,6 +49,11 @@ Route::get('/branches/add', function () {
     return view('branches.add');
 });
 
+# View Warehouse
+Route::get('/warehouse/index', function () {
+    return view('warehouse.index');
+})->name('warehouse.index');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
@@ -104,11 +109,6 @@ Route::get('product/category/detail', function () {
     return view('product/category/detail');
 });
 
-#warehouse
-Route::get('/warehouse/list', [WarehouseController::class, 'getWarehouseAll'])->name('warehouse.list');
-
-// Route::post('/warehouse/add', [WarehouseController::class, 'addWarehouse'])->name('warehouse.add');
-
 # Product
 Route::get('/product/list', [ProductController::class, 'getProductList'])->name('product.list');
 Route::get('/products/detail/{id}', [ProductController::class, 'getProductById']);
@@ -119,8 +119,6 @@ Route::get('/product/pdf', [ProductController::class, 'generatePDF'])->name('pro
 Route::get('/product/search/{keyword}', [ProductController::class, 'searchProduct'])->name('product.search');
 Route::get('/products/print/{type}', [ProductController::class, 'printProductsByType'])->name('products.print.by-type');
 Route::get('/products/type/{type}', [ProductController::class, 'getProductByType']);
-
-
 
 #Product Update
 Route::put('/product/update/{id}', [ProductController::class, 'updateProduct'])->name('product.updateProduct'); //Sudah sesuai pada ERP RPL
@@ -135,13 +133,12 @@ Route::get('/branches', [BranchController::class, 'index'])->name('branches.inde
 Route::get('/branches/create', [BranchController::class, 'create'])->name('branches.create');
 Route::post('/branches', [BranchController::class, 'store'])->name('branches.store');
 Route::get('/branches/{id}', [BranchController::class, 'show'])->name('branches.show');
-Route::get('/branches/{id}/edit', [App\Http\Controllers\BranchController::class, 'edit'])->name('branches.edit');
-Route::put('/branches/{id}', [App\Http\Controllers\BranchController::class, 'update'])->name('branches.update');
-// Route::post('/branch/add', [BranchController::class, 'addBranch'])->name('branch.add');
+Route::get('/branches/{id}/edit', [BranchController::class, 'edit'])->name('branches.edit');
+Route::put('/branches/{id}', [BranchController::class, 'update'])->name('branches.update');
 Route::get('/branch', [BranchController::class, 'getBranchAll'])->name('branch.list');
 Route::delete('/branches/{id}', [BranchController::class, 'destroy'])->name('branches.destroy');
 Route::get('/branch/{id}', [BranchController::class, 'getBranchByID'])->name('branch.detail');
-Route::post('/branch/update/{id}', [BranchController::class, 'updateBranch'])->name('branch.update');
+// Route::post('/branch/update/{id}', [BranchController::class, 'updateBranch'])->name('branch.update');
 Route::get('/branch/detail/{id}', [BranchController::class, 'getBranchByID']);
 
 # PurchaseOrders
@@ -215,13 +212,11 @@ Route::get('/supplier-material/{supplier_id}/{product_type}', [SupplierMaterialC
 Route::put('/supplier/update/{id}', [SupplierController::class, 'updateSupplier'])->name('supplier.updateSupplier'); //Sudah sesuai pada ERP RPL
 Route::get('/supplier/update/{id}', [SupplierController::class, 'updateSupplier'])->name('supplier.updateSupplier');
 
-
 #Cetak pdf
 Route::get('/category/print', [CategoryController::class, 'printCategoryPDF'])->name('category.print');
 Route::get('/product/print/{type}', [ProductController::class, 'printProductsByType'])->name('product.print.type');
 // Cetak produk berdasarkan kategori tertentu 
 Route::get('/category/print/{id}', [ProductController::class, 'printCategoryByIdPDF'])->name('category.print.single');
-
 
 #Category
 Route::get('/category/search', [CategoryController::class, 'searchCategory']);
@@ -231,7 +226,6 @@ Route::get('/category/{id}', [CategoryController::class, 'getCategoryById']);
 Route::delete('/category/delete/{id}', [CategoryController::class, 'deleteCategory'])->name('category.delete');
 Route::get('/category/parent/{parentId}', [CategoryController::class, 'getCategoryByParent']);
 Route::get('/category', [CategoryController::class, 'getCategoryList'])->name('category.list');
-
 
 #Supplier Pic
 Route::delete('/supplier/pic/delete/{id}', [SupplierPIController::class, 'deleteSupplierPIC'])->name('supplier.pic.delete');
@@ -243,8 +237,9 @@ Route::get('/supplier-pic/cetak-pdf', [SupplierPIController::class, 'cetakPdf'])
 Route::get('/supplier-pic/cetak-pdf/{supplierID}', [SupplierPiController::class, 'cetakPdfBySupplier'])
     ->name('supplier.pic.pdf.bySupplier');
 
-
 # Warehouse
+Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+// Route::post('/warehouse/add', [WarehouseController::class, 'addWarehouse'])->name('warehouse.add');
 Route::get('/warehouse/detail/{id}', [WarehouseController::class, 'getWarehouseById'])->name('warehouse.detail');
 Route::get('/warehouse/search', [WarehouseController::class, 'searchWarehouse'])->name('warehouse.search');
 Route::delete('/warehouse/delete/{id}', [WarehouseController::class, 'deleteWarehouse'])->name('warehouse.delete');
@@ -313,11 +308,5 @@ Route::put('/bill-of-material/{id}', [BillOfMaterialController::class, 'updateBi
 
 Route::post('/assort-production/add', [AssortProductionController::class, 'addProduction'])->name('assort-production.add');
 
-
-// Route untuk daftar warehouse (list)
-Route::get('/warehouse/list', [WarehouseController::class, 'getWarehouseAll'])->name('warehouse.list');
-Route::get('/warehouse', [WarehouseController::class, 'getWarehouseAll'])->name('warehouse.all');
-
 Route::get('/supplier-pic/{supplierID}', [SupplierPIController::class, 'getSupplierPIC']);
-
 Route::post('/supplier/add', [SupplierController::class, 'AddSuplier'])->name('supplier.add');

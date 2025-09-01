@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
 use App\Constants\WarehouseColumns;
 
 class Warehouse extends Model
 {
+    use HasFactory;
+    
     protected $table;
     protected $fillable = [];
 
@@ -16,14 +19,28 @@ class Warehouse extends Model
         parent::__construct($attributes);
 
         // Tetapkan nama tabel dan kolom
-        $this->table = config('db_constants.table.whouse');
+        $this->table = config('db_tables.warehouse');
         $this->fillable = WarehouseColumns::getFillable();
+    }
+
+    public static function getWarehouseAll($search = null)
+    {
+        $query = self::query();
+
+        if ($search) {
+            $query->where(WarehouseColumns::NAME, 'LIKE', "%{$search}%")
+                  ->orWhere(WarehouseColumns::ADDRESS, 'LIKE', "%{$search}%")
+                  ->orWhere(WarehouseColumns::PHONE, 'LIKE', "%{$search}%");
+        }
+
+        return $query->orderBy(WarehouseColumns::CREATED_AT, 'asc')->paginate(config('pagination.branch_per_page'));
     }
 
     public function getWarehouseById($id)
     {
-        return self::where(WarehouseColumns::ID, $id)->first();
+        return self::find($id);
     }
+
     public static function countWarehouse()
     {
         return self::count();
@@ -39,6 +56,7 @@ class Warehouse extends Model
 
         return $warehouse->update($data);
     }
+
     public function searchWarehouse($keyword)
     {
         return self::where(function ($query) use ($keyword) {
@@ -101,8 +119,4 @@ class Warehouse extends Model
         ]);
     }
 
-    public static function getWarehouseAll()
-    {
-        return self::paginate(10);
-    }
 }

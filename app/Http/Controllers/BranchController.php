@@ -10,6 +10,7 @@ use App\Http\Resources\BranchCollection;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Constants\BranchColumns;
+use App\Constants\Messages;
 
 class BranchController extends Controller
 {
@@ -56,9 +57,9 @@ class BranchController extends Controller
      */
     public function edit($id)
     {
-        $branch = \App\Models\Branch::getBranchById($id);
+        $branch = Branch::getBranchById($id);
         if (!$branch) {
-            return abort(404, 'Cabang tidak ditemukan');
+            return abort(404, Messages::BRANCH_NOT_FOUND);
         }
         return view('branches.edit', compact('branch'));
     }
@@ -78,13 +79,13 @@ class BranchController extends Controller
             if ($this->wantsJson($request)) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Branch created successfully',
+                    'message' => Messages::BRANCH_CREATED,
                     'data' => new BranchResource($branch)
                 ], 201);
             }
 
             // Handle Web Response (existing)
-            return redirect()->route('branches.index')->with('success', 'Cabang berhasil ditambahkan!');
+            return redirect()->route('branches.index')->with('success', Messages::BRANCH_CREATED);
             
         } catch (\Exception $e) {
             if ($this->wantsJson($request)) {
@@ -105,10 +106,10 @@ class BranchController extends Controller
             if ($this->wantsJson($request)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cabang tidak ditemukan!'
+                    'message' => Messages::BRANCH_NOT_FOUND
                 ], 404);
             }
-            return abort(404, 'Cabang tidak ditemukan');
+            return abort(404, Messages::BRANCH_NOT_FOUND);
         }
         // Handle API Request
         if ($this->wantsJson($request)) {
@@ -136,16 +137,16 @@ class BranchController extends Controller
                 if ($this->wantsJson($request)) {
                     return response()->json([
                         'success' => true,
-                        'message' => 'Branch updated successfully',
+                        'message' => Messages::BRANCH_UPDATED,
                         'data' => new BranchResource($branch)
                     ]);
                 }
 
                 // Handle Web Response (existing)
-                return redirect()->route('branches.index')->with('success', 'Cabang berhasil diupdate!');
+                return redirect()->route('branches.index')->with('success', Messages::BRANCH_UPDATED);
             }
 
-            throw new \Exception('Failed to update branch');
+            throw new \Exception(Messages::BRANCH_FAILED_TO_UPDATED);
 
         } catch (\Exception $e) {
             if ($this->wantsJson($request)) {
@@ -180,10 +181,10 @@ class BranchController extends Controller
             if ($this->wantsJson($request)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cabang tidak bisa dihapus karena masih digunakan di tabel lain!'
+                    'message' => Messages::BRANCH_IN_USE
                 ], 422);
             }
-            return redirect()->route('branches.index')->with('error', 'Cabang tidak bisa dihapus karena masih digunakan di tabel lain!');
+            return redirect()->route('branches.index')->with('error', Messages::BRANCH_IN_USE);
         }
 
         $deleted = Branch::deleteBranch($id);
@@ -192,20 +193,20 @@ class BranchController extends Controller
             if ($this->wantsJson($request)) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Cabang berhasil dihapus!'
+                    'message' => Messages::BRANCH_DELETED
                 ]);
             }
-            return redirect()->route('branches.index')->with('success', 'Cabang berhasil dihapus!');
+            return redirect()->route('branches.index')->with('success', Messages::BRANCH_DELETED);
         }
 
         // Gagal hapus branch (branch tidak ditemukan atau error lain)
         if ($this->wantsJson($request)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus cabang!'
+                'message' => Messages::BRANCH_DELETE_FAILED
             ], 422);
         }
-        return redirect()->route('branches.index')->with('error', 'Gagal menghapus cabang!');
+        return redirect()->route('branches.index')->with('error', Messages::BRANCH_DELETE_FAILED);
     }
 
     /**
@@ -273,22 +274,22 @@ class BranchController extends Controller
         return $this->show(request(), $id);
     }
 
-    public function updateBranch(Request $request, $id)
-    {
-        // Validate manually since this bypasses UpdateBranchRequest
-        $request->validate([
-            'branch_name' => 'required|string|min:3',
-            'branch_address' => 'required|string|min:3',
-            'branch_telephone' => 'required|string|min:3',
-        ]);
+    // public function updateBranch(Request $request, $id)
+    // {
+    //     // Validate manually since this bypasses UpdateBranchRequest
+    //     $request->validate([
+    //         'branch_name' => 'required|string|min:3',
+    //         'branch_address' => 'required|string|min:3',
+    //         'branch_telephone' => 'required|string|min:3',
+    //     ]);
 
-        return $this->update($request, $id);
-    }
+    //     return $this->update($request, $id);
+    // }
 
-    public function deleteBranch($id)
-    {
-        return $this->destroy(request(), $id);
-    }
+    // public function deleteBranch($id)
+    // {
+    //     return $this->destroy(request(), $id);
+    // }
 
     // Helper method for web routes compatibility
     public function getBranchAll(Request $request)

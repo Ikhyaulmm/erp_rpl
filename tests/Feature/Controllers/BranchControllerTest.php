@@ -469,4 +469,43 @@ class BranchControllerTest extends TestCase
             'branch_name' => 'Mocked Ref Branch'
         ]);
     }
+
+    /**
+     * Test update branch via BranchController
+     */
+    public function test_it_can_update_branch()
+    {
+        // Arrange: Buat branch awal
+        $branch = Branch::factory()->create([
+            BranchColumns::NAME => 'Branch Before Update',
+            BranchColumns::ADDRESS => 'Address Before Update',
+            BranchColumns::PHONE => '081234567890',
+            BranchColumns::IS_ACTIVE => 1,
+        ]);
+
+        // Data update
+        $updateData = [
+            BranchColumns::NAME => 'Branch After Update',
+            BranchColumns::ADDRESS => 'Address After Update',
+            BranchColumns::PHONE => '089876543210',
+            BranchColumns::IS_ACTIVE => 0,
+        ];
+
+        // Act: Kirim request update
+        $response = $this->put(route('branches.update', $branch->id), $updateData);
+
+        // Assert: Redirect ke index dan pesan sukses
+        $response->assertStatus(302);
+        $response->assertRedirect(route('branches.index'));
+        $response->assertSessionHas('success', 'Cabang berhasil diupdate!');
+
+        // Assert: Data di database sudah terupdate
+        $this->assertDatabaseHas(config('db_tables.branch'), [
+            'id' => $branch->id,
+            BranchColumns::NAME => 'Branch After Update',
+            BranchColumns::ADDRESS => 'Address After Update',
+            BranchColumns::PHONE => '089876543210',
+            BranchColumns::IS_ACTIVE => 0,
+        ]);
+    }
 }

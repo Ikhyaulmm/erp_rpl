@@ -2,12 +2,14 @@
 
 namespace App\Constants;
 
-class CategoryColumns
+class ProductColumns
 {
     public const ID             = 'id';
+    public const PRODUCT_ID     = 'product_id';
+    public const NAME           = 'name';
+    public const TYPE           = 'type';
     public const CATEGORY       = 'category';
-    public const PARENT         = 'parent_id';
-    public const IS_ACTIVE      = 'is_active';
+    public const DESC           = 'description';
     public const CREATED_AT     = 'created_at';
     public const UPDATED_AT     = 'updated_at';
 
@@ -17,9 +19,11 @@ class CategoryColumns
     public static function getFillable(): array
     {
         return [
+            self::PRODUCT_ID,
+            self::NAME,
+            self::TYPE,
             self::CATEGORY,
-            self::PARENT,
-            self::IS_ACTIVE,
+            self::DESC,
         ];
     }
 
@@ -30,12 +34,14 @@ class CategoryColumns
     {
         return [
             self::ID,
+            self::PRODUCT_ID,
+            self::NAME,
+            self::TYPE,
             self::CATEGORY,
-            self::PARENT,
-            self::IS_ACTIVE,
+            self::DESC,
             self::CREATED_AT,
             self::UPDATED_AT,
         ];
     }
-    
+
 }
