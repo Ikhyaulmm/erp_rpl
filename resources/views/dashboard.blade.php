@@ -300,7 +300,7 @@
               </a>
             </li>
              <li class="nav-item">
-              <a href="{{ route('warehouse.list') }}" class="nav-link">
+              <a href="{{ route('warehouses.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-box2"></i>
                 <p>Warehouse</p>
               </a>

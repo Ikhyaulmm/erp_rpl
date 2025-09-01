@@ -282,6 +282,20 @@
                           <label class="custom-control-label" for="is_active">Aktif</label>
                         </div>
                       </div>
+                      
+                      <div class="form-group">
+                        <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="is_rm_warehouse" name="is_rm_warehouse">
+                          <label class="custom-control-label" for="is_rm_warehouse">Raw Material Warehouse</label>
+                        </div>
+                      </div>
+                      
+                      <div class="form-group">
+                        <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="is_fg_warehouse" name="is_fg_warehouse">
+                          <label class="custom-control-label" for="is_fg_warehouse">Finished Goods Warehouse</label>
+                        </div>
+                      </div>
                     </div>
                     
                     <div class="card-footer">

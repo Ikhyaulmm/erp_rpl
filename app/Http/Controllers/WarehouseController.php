@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreWarehouseRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -44,6 +45,47 @@ class WarehouseController extends Controller
         }
 
         return view('warehouse.index', ['warehouses' => $warehouses]);
+    }
+
+    /** Show the form for creating a new resource. */
+    public function create()
+    {
+        return view('warehouse.create');
+    }
+
+    public function store(StoreWarehouseRequest $request)
+    {
+        try {
+            // Single business logic - no duplication!
+            $warehouse = Warehouse::addWarehouse([
+                WarehouseColumns::NAME => $request->input('warehouse_name') ?? $request->input(WarehouseColumns::NAME),
+                WarehouseColumns::ADDRESS => $request->input('warehouse_address') ?? $request->input(WarehouseColumns::ADDRESS),
+                WarehouseColumns::PHONE => $request->input('warehouse_telephone') ?? $request->input(WarehouseColumns::PHONE),
+                // WarehouseColumns::IS_ACTIVE => $request->input(WarehouseColumns::IS_ACTIVE, 0),
+            ]);
+
+            // Handle API Response
+            if ($this->wantsJson($request)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => Messages::WAREHOUSE_CREATED,
+                    'data' => new WarehouseResource($warehouse)
+                ], 201);
+            }
+
+            // Handle Web Response (existing)
+            return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_CREATED);
+            
+        } catch (\Exception $e) {
+            if ($this->wantsJson($request)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
+
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
     }
 
     #TODO membuat method edit dan update
@@ -144,34 +186,7 @@ class WarehouseController extends Controller
             return response()->json(['message' => 'Tidak ada warehouse yang ditemukan'], 404);
         }
 
-        return view('warehouse.list', compact('warehouses'));
-    }
-  
-    public function addWarehouse(Request $request)
-    {
-        $data = $request->all(); 
-        $validator = Validator::make($data, [
-            'warehouse_name' => 'required|min:3|unique:warehouse,warehouse_name',
-            'warehouse_address' => 'required',
-            'warehouse_telephone' => 'required',
-            'is_rm_whouse' => 'required|boolean',
-            'is_fg_whouse' => 'required|boolean',
-            'is_active' => 'required|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'errors' => $validator->errors(),
-            ];
-        }
-
-        Warehouse::addWarehouse($data);
-
-        return [
-            'success' => true,
-            'message' => 'Warehouse berhasil ditambahkan.',
-        ];
+        return view('warehouse.index', compact('warehouses'));
     }
 
         /**

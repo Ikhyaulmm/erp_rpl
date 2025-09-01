@@ -239,7 +239,8 @@ Route::get('/supplier-pic/cetak-pdf/{supplierID}', [SupplierPiController::class,
 
 # Warehouse
 Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
-// Route::post('/warehouse/add', [WarehouseController::class, 'addWarehouse'])->name('warehouse.add');
+Route::get('/warehouses/create', [WarehouseController::class, 'create'])->name('warehouses.create');
+Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
 Route::get('/warehouse/detail/{id}', [WarehouseController::class, 'getWarehouseById'])->name('warehouse.detail');
 Route::get('/warehouse/search', [WarehouseController::class, 'searchWarehouse'])->name('warehouse.search');
 Route::delete('/warehouse/delete/{id}', [WarehouseController::class, 'deleteWarehouse'])->name('warehouse.delete');
