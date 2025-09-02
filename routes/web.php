@@ -23,7 +23,7 @@ use App\Http\Controllers\GoodsReceiptNoteController;
 use App\Models\BillOfMaterial;
 
 # Route GET untuk form tambah merk
-Route::get('/merk/add', function () {
+Route::get('/merks/add', function () {
     return view('merk.add');
 });
 
@@ -48,11 +48,6 @@ Route::get('/branches/index', function () {
 Route::get('/branches/add', function () {
     return view('branches.add');
 });
-
-# View Warehouse (DEPRECATED - use warehouses.index instead)
-# Route::get('/warehouse/index', function () {
-#     return view('warehouse.index');
-# })->name('warehouse.index');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -85,17 +80,19 @@ Route::get('/item/add', function () {
     return view('item/add');
 });
 
-// Dikonfirmasi oleh chiqitita_C_163 - route form tambah produk sudah tersedia
 Route::get('/product/add', function () {
     return view('product/add');
 });
+
 Route::get('/supplier/list', [App\Http\Controllers\SupplierController::class, 'listSuppliers'])->name('supplier.list');
 Route::get('/supplier/material/detail', function () {
     return view('supplier/material/detail');
 });
+
 Route::get('/goods_receipt_note/add', function () {
     return view('goods_receipt_note/add');
 });
+
 Route::get('/goods_receipt_note/detail', function () {
     return view('goods_receipt_note/detail');
 });
@@ -103,11 +100,53 @@ Route::get('/goods_receipt_note/detail', function () {
 Route::get('/warehouse/add', function () {
     return view('warehouse/add');
 })->name('warehouse.add');
+
 Route::post('/warehouse/add', [WarehouseController::class, 'addWarehouse']);
 
 Route::get('product/category/detail', function () {
     return view('product/category/detail');
 });
+
+# Branch Routes
+Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
+Route::get('/branches/create', [BranchController::class, 'create'])->name('branches.create');
+Route::post('/branches', [BranchController::class, 'store'])->name('branches.store');
+Route::get('/branches/{id}', [BranchController::class, 'show'])->name('branches.show');
+Route::get('/branches/{id}/edit', [BranchController::class, 'edit'])->name('branches.edit');
+Route::put('/branches/{id}', [BranchController::class, 'update'])->name('branches.update');
+Route::get('/branch', [BranchController::class, 'getBranchAll'])->name('branch.list');
+Route::delete('/branches/{id}', [BranchController::class, 'destroy'])->name('branches.destroy');
+Route::get('/branch/{id}', [BranchController::class, 'getBranchByID'])->name('branch.detail');
+Route::get('/branch/detail/{id}', [BranchController::class, 'getBranchByID']);
+
+# Warehouse
+Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+Route::get('/warehouses/create', [WarehouseController::class, 'create'])->name('warehouses.create');
+Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
+Route::get('/warehouses/{id}/edit', [WarehouseController::class, 'edit'])->name('warehouses.edit');
+Route::put('/warehouses/{id}', [WarehouseController::class, 'update'])->name('warehouses.update');
+Route::delete('/warehouses/{id}', [WarehouseController::class, 'destroy'])->name('warehouses.destroy');
+Route::get('/warehouse/detail/{id}', [WarehouseController::class, 'getWarehouseById'])->name('warehouse.detail');
+Route::get('/warehouse/search', [WarehouseController::class, 'searchWarehouse'])->name('warehouse.search');
+Route::delete('/warehouse/delete/{id}', [WarehouseController::class, 'deleteWarehouse'])->name('warehouse.delete');
+Route::get('/warehouse/count', [WarehouseController::class, 'countWarehouse']);
+Route::get('/warehouse/report', [WarehouseController::class, 'exportPdf'])->name('warehouse.report');
+
+# Merk - Resource Routes
+Route::resource('merk', MerkController::class);
+
+# Merk - Legacy API Routes (for backward compatibility)
+Route::get('/merks', [MerkController::class, 'index'])->name('merks.index');
+Route::get('/merks/create', [MerkController::class, 'create'])->name('merks.create');
+Route::post('/merks', [MerkController::class, 'store'])->name('merks.store');
+Route::get('/merks/{id}', [MerkController::class, 'show'])->name('merks.show');
+Route::get('/merks/{id}/edit', [MerkController::class, 'edit'])->name('merks.edit');
+Route::put('/merks/{id}', [MerkController::class, 'update'])->name('merks.update');
+Route::delete('/merks/{id}', [MerkController::class, 'destroy'])->name('merks.destroy');
+Route::get('/merks/{id}/detail', [MerkController::class, 'getMerkById'])->name('merks.detail.legacy');
+Route::post('/merks/add', [MerkController::class, 'addMerk'])->name('merks.add.legacy');
+Route::post('/merks/update/{id}', [MerkController::class, 'updateMerk'])->name('merks.update.legacy');
+Route::delete('/merks/delete/{id}', [MerkController::class, 'deleteMerk'])->name('merks.delete.legacy');
 
 # Product
 Route::get('/product/list', [ProductController::class, 'getProductList'])->name('product.list');
@@ -127,19 +166,6 @@ Route::get('/product/update/{id}', [ProductController::class, 'updateProduct'])-
 # API
 Route::get('/products', [APIProductController::class, 'getProducts'])->name('api.products');
 Route::get('/prices', [APIProductController::class, 'getAvgBasePrice'])->name('api.prices');
-
-# Branch Routes
-Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
-Route::get('/branches/create', [BranchController::class, 'create'])->name('branches.create');
-Route::post('/branches', [BranchController::class, 'store'])->name('branches.store');
-Route::get('/branches/{id}', [BranchController::class, 'show'])->name('branches.show');
-Route::get('/branches/{id}/edit', [BranchController::class, 'edit'])->name('branches.edit');
-Route::put('/branches/{id}', [BranchController::class, 'update'])->name('branches.update');
-Route::get('/branch', [BranchController::class, 'getBranchAll'])->name('branch.list');
-Route::delete('/branches/{id}', [BranchController::class, 'destroy'])->name('branches.destroy');
-Route::get('/branch/{id}', [BranchController::class, 'getBranchByID'])->name('branch.detail');
-// Route::post('/branch/update/{id}', [BranchController::class, 'updateBranch'])->name('branch.update');
-Route::get('/branch/detail/{id}', [BranchController::class, 'getBranchByID']);
 
 # PurchaseOrders
 Route::get('/purchase_orders/{id}', [PurchaseOrderController::class, 'getPurchaseOrderByID']);
@@ -187,13 +213,6 @@ Route::get('/item/pdf/product/{productType}', [ItemController::class, 'exportByP
 
 Route::get('/item/export/category/{id}', [ItemController::class, 'exportItemByCategoryToPdf'])->name('item.export.category');
 
-# Merk
-Route::get('/merk/{id}', [MerkController::class, 'getMerkById'])->name('merk.detail');
-Route::post('/merk/add', [MerkController::class, 'addMerk'])->name('merk.add');
-Route::post('/merk/update/{id}', [MerkController::class, 'updateMerk'])->name('merk.add');
-Route::get('/merks', [MerkController::class, 'getMerkAll'])->name('merk.list');
-Route::delete('/merk/delete/{id}', [MerkController::class, 'deleteMerk'])->name('merk.delete');
-
 #Supplier
 Route::get('/supplier/material', [SupplierMaterialController::class, 'getSupplierMaterial'])->name('supplier.material');
 Route::post('/supplier/material/add', [SupplierMaterialController::class, 'addSupplierMaterial'])->name('supplier.material.add');
@@ -236,19 +255,6 @@ Route::get('/supplier-pic/cetak-pdf', [SupplierPIController::class, 'cetakPdf'])
 # cetak pdf PIC per Supplier ID
 Route::get('/supplier-pic/cetak-pdf/{supplierID}', [SupplierPiController::class, 'cetakPdfBySupplier'])
     ->name('supplier.pic.pdf.bySupplier');
-
-# Warehouse
-Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
-Route::get('/warehouses/create', [WarehouseController::class, 'create'])->name('warehouses.create');
-Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
-Route::get('/warehouses/{id}/edit', [WarehouseController::class, 'edit'])->name('warehouses.edit');
-Route::put('/warehouses/{id}', [WarehouseController::class, 'update'])->name('warehouses.update');
-Route::delete('/warehouses/{id}', [WarehouseController::class, 'destroy'])->name('warehouses.destroy');
-Route::get('/warehouse/detail/{id}', [WarehouseController::class, 'getWarehouseById'])->name('warehouse.detail');
-Route::get('/warehouse/search', [WarehouseController::class, 'searchWarehouse'])->name('warehouse.search');
-Route::delete('/warehouse/delete/{id}', [WarehouseController::class, 'deleteWarehouse'])->name('warehouse.delete');
-Route::get('/warehouse/count', [WarehouseController::class, 'countWarehouse']);
-Route::get('/warehouse/report', [WarehouseController::class, 'exportPdf'])->name('warehouse.report');
 
 #production
 Route::get('/production', [AssortProductionController::class, 'getProduction']);

@@ -26,6 +26,9 @@ class StoreWarehouseRequest extends FormRequest
             WarehouseColumns::NAME => 'required|string|min:3|max:50|unique:warehouses,warehouse_name',
             WarehouseColumns::ADDRESS => 'required|string|min:3|max:100',
             WarehouseColumns::PHONE => 'required|string|min:3|max:30',
+            WarehouseColumns::IS_ACTIVE => 'boolean',
+            WarehouseColumns::IS_RM_WAREHOUSE => 'boolean',
+            WarehouseColumns::IS_FG_WAREHOUSE => 'boolean',
         ];
     }
 

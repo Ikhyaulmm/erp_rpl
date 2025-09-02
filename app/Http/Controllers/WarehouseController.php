@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWarehouseRequest;
 use App\Http\Requests\UpdateWarehouseRequest;
-use App\Http\Requests\UpdateBranchRequest;
+use App\Http\Resources\WarehouseCollection;
+use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Validator;
 use App\Constants\Messages;
 use App\Constants\WarehouseColumns;
 
@@ -21,8 +21,11 @@ class WarehouseController extends Controller
     {
         $search = $request->input('search');
         
+        // Force JSON response for API routes (check if route starts with 'api.')
+        $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+        
         //Use enhanced query for API requests
-        if ($request->wantsJson()) {
+        if ($isApiRequest) {
             // Best Practice: Use Model method instead of Controller query
             $filters = [
                 'search' => $search,
@@ -57,35 +60,32 @@ class WarehouseController extends Controller
     public function store(StoreWarehouseRequest $request)
     {
         try {
-            // Convert checkbox values to proper boolean integers
-            $isActive = $request->has('is_active') ? 1 : 0;
-            $isRmWarehouse = $request->has('is_rm_warehouse') ? 1 : 0;
-            $isFgWarehouse = $request->has('is_fg_warehouse') ? 1 : 0;
+            $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
 
-            // Single business logic - no duplication!
-            $warehouse = Warehouse::addWarehouse([
+            // Create warehouse using direct Eloquent
+            $warehouse = Warehouse::create([
                 WarehouseColumns::NAME => $request->input('warehouse_name'),
                 WarehouseColumns::ADDRESS => $request->input('warehouse_address'),
                 WarehouseColumns::PHONE => $request->input('warehouse_phone'),
-                WarehouseColumns::IS_ACTIVE => $isActive,
-                WarehouseColumns::IS_RM_WAREHOUSE => $isRmWarehouse,
-                WarehouseColumns::IS_FG_WAREHOUSE => $isFgWarehouse,
+                WarehouseColumns::IS_ACTIVE => $request->boolean('is_active'),
+                WarehouseColumns::IS_RM_WAREHOUSE => $request->boolean('is_rm_warehouse'),
+                WarehouseColumns::IS_FG_WAREHOUSE => $request->boolean('is_fg_warehouse'),
             ]);
 
-            // Handle API Response
-            if ($request->wantsJson()) {
+            if ($isApiRequest) {
                 return response()->json([
                     'success' => true,
                     'message' => Messages::WAREHOUSE_CREATED,
-                    'data' => $warehouse
+                    'data' => new WarehouseResource($warehouse)
                 ], 201);
             }
 
-            // Handle Web Response (existing)
             return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_CREATED);
             
         } catch (\Exception $e) {
-            if ($request->wantsJson()) {
+            $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+            
+            if ($isApiRequest) {
                 return response()->json([
                     'success' => false,
                     'message' => $e->getMessage()
@@ -96,58 +96,83 @@ class WarehouseController extends Controller
         }
     }
 
-    #TODO membuat method edit dan update
     /**
      * Show the form for editing the specified warehouse.
      */
     public function edit($id)
     {
-        $warehouse = Warehouse::getWarehouseById($id);
+        $warehouse = Warehouse::find($id);
         if (!$warehouse) {
             return abort(404, Messages::WAREHOUSE_NOT_FOUND);
         }
         return view('warehouse.edit', compact('warehouse'));
     }
 
-
-    public function getWarehouseById($id)
+    /**
+     * Display the specified resource (API endpoint)
+     */
+    public function show(Request $request, $id)
     {
-        $warehouse = Warehouse::getWarehouseById($id);
+        $warehouse = Warehouse::find($id);
 
         if (!$warehouse) {
+            $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+            
+            if ($isApiRequest) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Messages::WAREHOUSE_NOT_FOUND
+                ], 404);
+            }
             return abort(404, Messages::WAREHOUSE_NOT_FOUND);
+        }
+
+        $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+        
+        if ($isApiRequest) {
+            return response()->json([
+                'success' => true,
+                'data' => new WarehouseResource($warehouse)
+            ]);
         }
 
         return view('warehouse.detail', compact('warehouse'));
     }
 
+    /**
+     * DEPRECATED: Keep for backward compatibility - will be removed
+     */
+    public function getWarehouseById($id)
+    {
+        return $this->show(request(), $id);
+    }
+
+    /**
+     * DEPRECATED: Use statistics() method instead
+     */
     public function countWarehouse()
     {
-        $total = Warehouse::countWarehouse();
+        $total = Warehouse::count();
 
         return response()->json([
             'total_warehouse' => $total
         ]);
     }
 
+    /**
+     * DEPRECATED: Use search() method instead
+     */
     public function searchWarehouse(Request $request)
     {
-        $keyword = $request->input('keyword');
-        $warehouses = (new Warehouse())->searchWarehouse($keyword);
-
-        if ($warehouses->isEmpty()) {
-            return response()->json(['message' => 'Tidak ada warehouse yang ditemukan'], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $warehouses
-        ]);
+        return $this->search($request);
     }
 
+    /**
+     * DEPRECATED: Keep for backward compatibility - will be removed
+     */
     public function deleteWarehouse($id)
     {
-        return (new Warehouse)->deleteWarehouse($id);
+        return $this->destroy(request(), $id);
     }
 
     /**
@@ -155,10 +180,12 @@ class WarehouseController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $warehouse = Warehouse::getWarehouseById($id);
+        $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+        
+        $warehouse = Warehouse::find($id);
 
         if (!$warehouse) {
-            if ($request->wantsJson()) {
+            if ($isApiRequest) {
                 return response()->json([
                     'success' => false,
                     'message' => Messages::WAREHOUSE_NOT_FOUND
@@ -184,7 +211,7 @@ class WarehouseController extends Controller
         }
 
         if ($stockExists || $inventoryExists) {
-            if ($request->wantsJson()) {
+            if ($isApiRequest) {
                 return response()->json([
                     'success' => false,
                     'message' => Messages::WAREHOUSE_IN_USE
@@ -193,10 +220,10 @@ class WarehouseController extends Controller
             return redirect()->route('warehouses.index')->with('error', Messages::WAREHOUSE_IN_USE);
         }
 
-        $deleted = Warehouse::deleteWarehouse($id);
+        $deleted = $warehouse->delete();
 
         if ($deleted) {
-            if ($request->wantsJson()) {
+            if ($isApiRequest) {
                 return response()->json([
                     'success' => true,
                     'message' => Messages::WAREHOUSE_DELETED
@@ -205,8 +232,8 @@ class WarehouseController extends Controller
             return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_DELETED);
         }
 
-        // Gagal hapus warehouse (error lain)
-        if ($request->wantsJson()) {
+        // Gagal hapus warehouse
+        if ($isApiRequest) {
             return response()->json([
                 'success' => false,
                 'message' => Messages::WAREHOUSE_DELETE_FAILED
@@ -215,51 +242,23 @@ class WarehouseController extends Controller
         return redirect()->route('warehouses.index')->with('error', Messages::WAREHOUSE_DELETE_FAILED);
     }
 
+    /**
+     * DEPRECATED: Use proper export functionality instead
+     */
     public function exportPdf()
     {
-        $warehouse = [
-            [
-                'id' => 1,
-                'warehouse_name' => 'Warehouse A',
-                'warehouse_address' => 'Location A',
-                'warehouse_telephone' => '1234567890',
-                'is_active' => true,
-                'created_at' => '2023-01-01',
-                'updated_at' => '2023-01-02',
-            ],
-            [
-                'id' => 2,
-                'warehouse_name' => 'Warehouse B',
-                'warehouse_address' => 'Location B',
-                'warehouse_telephone' => '1234567890',
-                'is_active' => false,
-                'created_at' => '2023-02-01',
-                'updated_at' => '2023-04-01',
-            ],
-            [
-                'id' => 3,
-                'warehouse_name' => 'Warehouse C',
-                'warehouse_address' => 'Location C',
-                'warehouse_telephone' => '1234567890',
-                'is_active' => true,
-                'created_at' => '2023-01-06',
-                'updated_at' => '2023-01-04',
-            ],
-        ];
-
-        $pdf = Pdf::loadView('warehouse.report', compact('warehouse'));
+        $warehouses = Warehouse::orderBy(WarehouseColumns::CREATED_AT, 'desc')->get();
+        
+        $pdf = Pdf::loadView('warehouse.report', compact('warehouses'));
         return $pdf->stream('warehouse_report.pdf');
     }
 
+    /**
+     * DEPRECATED: Keep for backward compatibility - will be removed
+     */
     public function getWarehouseAll()
     {
-        $warehouses = Warehouse::getWarehouseAll();
-
-        if ($warehouses->isEmpty()) {
-            return response()->json(['message' => 'Tidak ada warehouse yang ditemukan'], 404);
-        }
-
-        return view('warehouse.index', compact('warehouses'));
+        return $this->index(request());
     }
 
     /**
@@ -268,45 +267,110 @@ class WarehouseController extends Controller
     public function update(UpdateWarehouseRequest $request, $id)
     {
         try {
-            $updated = (new Warehouse())->updateWarehouse($id, [
-                'warehouse_name' => $request->input('warehouse_name'),
-                'warehouse_address' => $request->input('warehouse_address'),
-                'warehouse_telephone' => $request->input('warehouse_telephone'),
-                'is_rm_whouse' => $request->input('is_rm_whouse'),
-                'is_fg_whouse' => $request->input('is_fg_whouse'),
-                'is_active' => $request->input('is_active'),
-            ]);
-
-                if ($updated) {
-                    $warehouse = (new Warehouse())->getWarehouseById($id);
-                    // API response
-                    if ($request->wantsJson()) {
-                        return response()->json([
-                            'success' => true,
-                            'message' => Messages::WAREHOUSE_UPDATED,
-                            'data' => $warehouse,
-                        ]);
-                    }
-                    // Web response
-                    return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_UPDATED);
-                }
-
-                // Not found
-                if ($request->wantsJson()) {
+            $warehouse = Warehouse::find($id);
+            
+            if (!$warehouse) {
+                $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+                
+                if ($isApiRequest) {
                     return response()->json([
                         'success' => false,
                         'message' => Messages::WAREHOUSE_NOT_FOUND,
                     ], 404);
                 }
                 return redirect()->back()->withInput()->with('error', Messages::WAREHOUSE_NOT_FOUND);
-            } catch (\Exception $e) {
-                if ($request->wantsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $e->getMessage(),
-                    ], 500);
-                }
-                return redirect()->back()->withInput()->with('error', $e->getMessage());
             }
+
+            $warehouse->update([
+                'warehouse_name' => $request->input('warehouse_name'),
+                'warehouse_address' => $request->input('warehouse_address'),
+                'warehouse_phone' => $request->input('warehouse_phone'),
+                'is_rm_warehouse' => $request->boolean('is_rm_warehouse'),
+                'is_fg_warehouse' => $request->boolean('is_fg_warehouse'),
+                'is_active' => $request->boolean('is_active'),
+            ]);
+
+            // Handle API Response
+            $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+            
+            if ($isApiRequest) {
+                return response()->json([
+                    'success' => true,
+                    'message' => Messages::WAREHOUSE_UPDATED,
+                    'data' => new WarehouseResource($warehouse->fresh())
+                ]);
+            }
+
+            // Handle Web Response
+            return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_UPDATED);
+            
+        } catch (\Exception $e) {
+            $isApiRequest = $request->wantsJson() || str_starts_with($request->route()->getName() ?? '', 'api.');
+            
+            if ($isApiRequest) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * API-specific endpoints
+     */
+    public function active(Request $request)
+    {
+        // Best Practice: Use Model method
+        if ($request->has('per_page')) {
+            $warehouses = Warehouse::where(WarehouseColumns::IS_ACTIVE, true)
+                                  ->orderBy(WarehouseColumns::CREATED_AT, 'desc')
+                                  ->paginate($request->get('per_page', 15));
+        } else {
+            $warehouses = Warehouse::where(WarehouseColumns::IS_ACTIVE, true)
+                                  ->orderBy(WarehouseColumns::CREATED_AT, 'desc')
+                                  ->get();
+        }
+
+        return new WarehouseCollection($warehouses);
+    }
+
+    public function statistics(Request $request)
+    {
+        // Best Practice: Use Model method for statistics
+        $stats = [
+            'total_warehouses' => Warehouse::count(),
+            'active_warehouses' => Warehouse::where(WarehouseColumns::IS_ACTIVE, true)->count(),
+            'inactive_warehouses' => Warehouse::where(WarehouseColumns::IS_ACTIVE, false)->count(),
+            'rm_warehouses' => Warehouse::where(WarehouseColumns::IS_RM_WAREHOUSE, true)->count(),
+            'fg_warehouses' => Warehouse::where(WarehouseColumns::IS_FG_WAREHOUSE, true)->count(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $stats
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        // Best Practice: Use Model method with filters
+        $filters = [
+            'name' => $request->get('name'),
+            'address' => $request->get('address'),
+            'phone' => $request->get('phone'),
+            'is_active' => $request->has('is_active') ? $request->boolean('is_active') : null,
+            'is_rm_warehouse' => $request->has('is_rm_warehouse') ? $request->boolean('is_rm_warehouse') : null,
+            'is_fg_warehouse' => $request->has('is_fg_warehouse') ? $request->boolean('is_fg_warehouse') : null,
+            'sort_by' => WarehouseColumns::CREATED_AT,
+            'sort_order' => 'desc'
+        ];
+
+        $query = Warehouse::searchWithFilters($filters);
+        $warehouses = $query->paginate($request->get('per_page', 15));
+
+        return new WarehouseCollection($warehouses);
+    }
 }

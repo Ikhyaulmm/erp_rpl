@@ -53,7 +53,7 @@ class Warehouse extends Model
 
     public function updateWarehouse($id, $data)
     {
-        $warehouse = $this->getWarehouseById($id);
+        $warehouse = self::getWarehouseById($id);
 
         if (!$warehouse) {
             return false;
@@ -77,5 +77,52 @@ class Warehouse extends Model
     public static function deleteWarehouse($id)
     {
         return self::where(WarehouseColumns::ID, $id)->delete();
+    }
+
+    /**
+     * Search warehouses with filters (for API endpoints)
+     */
+    public static function searchWithFilters($filters = [])
+    {
+        $query = self::query();
+
+        // Search filter
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where(WarehouseColumns::NAME, 'LIKE', "%{$search}%")
+                  ->orWhere(WarehouseColumns::ADDRESS, 'LIKE', "%{$search}%")
+                  ->orWhere(WarehouseColumns::PHONE, 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Status filter
+        if (!empty($filters['status'])) {
+            if ($filters['status'] === 'active') {
+                $query->where(WarehouseColumns::IS_ACTIVE, true);
+            } elseif ($filters['status'] === 'inactive') {
+                $query->where(WarehouseColumns::IS_ACTIVE, false);
+            }
+        }
+
+        // Type filters
+        if (!empty($filters['type'])) {
+            if ($filters['type'] === 'rm') {
+                $query->where(WarehouseColumns::IS_RM_WAREHOUSE, true);
+            } elseif ($filters['type'] === 'fg') {
+                $query->where(WarehouseColumns::IS_FG_WAREHOUSE, true);
+            } elseif ($filters['type'] === 'both') {
+                $query->where(WarehouseColumns::IS_RM_WAREHOUSE, true)
+                      ->where(WarehouseColumns::IS_FG_WAREHOUSE, true);
+            }
+        }
+
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? WarehouseColumns::CREATED_AT;
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        
+        $query->orderBy($sortBy, $sortOrder);
+
+        return $query;
     }
 }

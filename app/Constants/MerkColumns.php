@@ -4,11 +4,16 @@ namespace App\Constants;
 
 class MerkColumns
 {
-    public const ID             = 'id';
-    public const MERK           = 'merk';
-    public const IS_ACTIVE      = 'is_active';
-    public const CREATED_AT     = 'created_at';
-    public const UPDATED_AT     = 'updated_at';
+    // Table columns (sesuai dengan tabel yang sudah ada)
+    public const ID                 = 'id';
+    public const MERK              = 'merk';  // Kolom utama nama merk
+    public const IS_ACTIVE         = 'is_active';
+    public const CREATED_AT        = 'created_at';
+    public const UPDATED_AT        = 'updated_at';
+
+    // Alias untuk konsistensi dengan kode yang sudah dibuat
+    public const MERK_NAME         = self::MERK;
+    public const MERK_DESCRIPTION  = null; // Tidak ada di tabel ini
 
     /**
      * Get fillable columns (exclude id, created_at, updated_at)
@@ -18,6 +23,16 @@ class MerkColumns
         return [
             self::MERK,
             self::IS_ACTIVE,
+        ];
+    }
+
+    /**
+     * Get searchable columns
+     */
+    public static function getSearchable(): array
+    {
+        return [
+            self::MERK,
         ];
     }
 
@@ -34,5 +49,4 @@ class MerkColumns
             self::UPDATED_AT,
         ];
     }
-
 }

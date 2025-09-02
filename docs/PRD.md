@@ -167,6 +167,20 @@ Warehouse adalah gudang-gudang yang dimiliki oleh perusahaan. Gudang berfungsi u
   - Active = Gudang beroperasi normal
   - Inactive = Gudang tidak beroperasi/ditutup sementara
 
+- **Gudang Raw Material (RM)** (Required)
+  - Status gudang sebagai penyimpan Raw Material atau tidak
+  - Format: Boolean (Yes/No)
+  - Default: False
+  - Yes = Gudang sebagai penyimpan Raw Material
+  - No = Gudang bukan sebagai penyimpan Raw Material
+
+- **Gudang Finished Goods (FG)** (Required)
+  - Status gudang sebagai penyimpan barang jadi (finished goods) atau tidak
+  - Format: Boolean (Yes/No)
+  - Default: False
+  - Yes = Gudang sebagai penyimpan barang jadi (finished goods)
+  - No = Gudang bukan sebagai penyimpan barang jadi (finished goods)
+
 #### Business Rules
 - Warehouse name harus unik di seluruh sistem
 - Warehouse hanya bisa dihapus jika tidak muncul di tabel lain sebagai foreign key
