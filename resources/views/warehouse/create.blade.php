@@ -256,54 +256,36 @@
                   <div class="card-header">
                     <h3 class="card-title">Tambah Gudang</h3>
                   </div>
-                  {{-- warehouse list belum di buat --}}
-                  <form action="{{ route('warehouse.add') }}" method="get" id="warehouseForm"> 
-                    @csrf
-                    <div class="card-body">
-                      <div class="form-group">
-                        <label for="warehouse_name">Nama Gudang</label>
-                        <input type="text" class="form-control" id="warehouse_name" name="warehouse_name" value="">
-                      </div>
-                      
-                      <div class="form-group">
-                        <label for="warehouse_address">Alamat</label>
-                        <input type="textarea" class="form-control" id="warehouse_address" name="warehouse_address" value="">
-                        <!-- <textarea class="form-control" id="warehouse_address" name="warehouse_address" value readonly></textarea> -->
-                      </div>
-                      
-                      <div class="form-group">
-                        <label for="warehouse_telephone">Telepon</label>
-                        <input type="text" class="form-control" id="warehouse_telephone" name="warehouse_telephone" value="">
-                      </div>
-                      
-                      <div class="form-group">
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" checked>
-                          <label class="custom-control-label" for="is_active">Aktif</label>
-                        </div>
-                      </div>
-                      
-                      <div class="form-group">
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="is_rm_warehouse" name="is_rm_warehouse">
-                          <label class="custom-control-label" for="is_rm_warehouse">Raw Material Warehouse</label>
-                        </div>
-                      </div>
-                      
-                      <div class="form-group">
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="is_fg_warehouse" name="is_fg_warehouse">
-                          <label class="custom-control-label" for="is_fg_warehouse">Finished Goods Warehouse</label>
-                        </div>
-                      </div>
+
+                  {{-- Display validation errors --}}
+                  @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                    
-                    <div class="card-footer">
-                      <button type="submit" class="btn btn-primary">Simpan</button>
+                  @endif
+
+                  {{-- Display success/error messages --}}
+                  @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
                     </div>
-                  </form>
+                  @endif
+
+                  @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                  @endif
                   
-                  <div id="debug-output" class="mt-4" style="display: none;">
+                  @include('warehouse.form', [
+                    'action' => route('warehouses.store'),
+                    'method' => 'POST',
+                    'warehouse' => null
+                  ])                  <div id="debug-output" class="mt-4" style="display: none;">
                     <div class="card">
                       <div class="card-body bg-light">
                         <pre id="dd-content" class="p-3 bg-dark text-light" style="border-radius: 5px;"></pre>

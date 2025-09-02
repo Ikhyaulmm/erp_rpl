@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Constants\WarehouseColumns;
+use Illuminate\Validation\Rule;
 
 class UpdateWarehouseRequest extends FormRequest
 {
@@ -16,37 +18,47 @@ class UpdateWarehouseRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules()
+    public function rules(): array
     {
-        $id = $this->route('id');
+        $warehouseId = $this->route('id'); // Get ID from route parameter
+
         return [
-            'warehouse_name' => 'required|min:3|unique:warehouse,warehouse_name,' . $id,
-            'warehouse_address' => 'required',
-            'warehouse_telephone' => 'required',
-            'is_rm_whouse' => 'required|boolean',
-            'is_fg_whouse' => 'required|boolean',
-            'is_active' => 'required|boolean',
+            WarehouseColumns::NAME => [
+                'required',
+                'string',
+                'min:3',
+                'max:50',
+                Rule::unique('warehouses', 'warehouse_name')->ignore($warehouseId)
+            ],
+            WarehouseColumns::ADDRESS => 'required|string|min:3|max:100',
+            WarehouseColumns::PHONE => 'required|string|min:3|max:30',
         ];
     }
 
     /**
-     * Custom messages for validation errors.
+     * Get custom messages for validator errors.
      */
-    public function messages()
+    public function messages(): array
     {
         return [
-            'warehouse_name.required' => 'Nama gudang wajib diisi',
-            'warehouse_name.min' => 'Nama gudang minimal 3 karakter',
-            'warehouse_name.unique' => 'Nama gudang sudah ada, silakan gunakan nama lain',
-            'warehouse_address.required' => 'Alamat gudang wajib diisi',
-            'warehouse_telephone.required' => 'Telepon gudang wajib diisi',
-            'is_rm_whouse.required' => 'Status RM wajib diisi',
-            'is_rm_whouse.boolean' => 'Status RM harus berupa boolean',
-            'is_fg_whouse.required' => 'Status FG wajib diisi',
-            'is_fg_whouse.boolean' => 'Status FG harus berupa boolean',
-            'is_active.required' => 'Status aktif wajib diisi',
-            'is_active.boolean' => 'Status aktif harus berupa boolean',
+            WarehouseColumns::NAME . '.required' => 'Nama gudang wajib diisi.',
+            WarehouseColumns::NAME . '.string' => 'Nama gudang harus berupa teks.',
+            WarehouseColumns::NAME . '.min' => 'Nama gudang minimal 3 karakter.',
+            WarehouseColumns::NAME . '.max' => 'Nama gudang maksimal 50 karakter.',
+            WarehouseColumns::NAME . '.unique' => 'Nama gudang sudah ada, silakan gunakan nama lain.',
+
+            WarehouseColumns::ADDRESS . '.required' => 'Alamat gudang wajib diisi.',
+            WarehouseColumns::ADDRESS . '.string' => 'Alamat gudang harus berupa teks.',
+            WarehouseColumns::ADDRESS . '.min' => 'Alamat gudang minimal 3 karakter.',
+            WarehouseColumns::ADDRESS . '.max' => 'Alamat gudang maksimal 100 karakter.',
+
+            WarehouseColumns::PHONE . '.required' => 'Telepon gudang wajib diisi.',
+            WarehouseColumns::PHONE . '.string' => 'Telepon gudang harus berupa teks.',
+            WarehouseColumns::PHONE . '.min' => 'Telepon gudang minimal 3 karakter.',
+            WarehouseColumns::PHONE . '.max' => 'Telepon gudang maksimal 30 karakter.',
         ];
     }
 }

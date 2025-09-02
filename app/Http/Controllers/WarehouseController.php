@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWarehouseRequest;
+use App\Http\Requests\UpdateWarehouseRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -56,20 +57,27 @@ class WarehouseController extends Controller
     public function store(StoreWarehouseRequest $request)
     {
         try {
+            // Convert checkbox values to proper boolean integers
+            $isActive = $request->has('is_active') ? 1 : 0;
+            $isRmWarehouse = $request->has('is_rm_warehouse') ? 1 : 0;
+            $isFgWarehouse = $request->has('is_fg_warehouse') ? 1 : 0;
+
             // Single business logic - no duplication!
             $warehouse = Warehouse::addWarehouse([
-                WarehouseColumns::NAME => $request->input('warehouse_name') ?? $request->input(WarehouseColumns::NAME),
-                WarehouseColumns::ADDRESS => $request->input('warehouse_address') ?? $request->input(WarehouseColumns::ADDRESS),
-                WarehouseColumns::PHONE => $request->input('warehouse_telephone') ?? $request->input(WarehouseColumns::PHONE),
-                // WarehouseColumns::IS_ACTIVE => $request->input(WarehouseColumns::IS_ACTIVE, 0),
+                WarehouseColumns::NAME => $request->input('warehouse_name'),
+                WarehouseColumns::ADDRESS => $request->input('warehouse_address'),
+                WarehouseColumns::PHONE => $request->input('warehouse_phone'),
+                WarehouseColumns::IS_ACTIVE => $isActive,
+                WarehouseColumns::IS_RM_WAREHOUSE => $isRmWarehouse,
+                WarehouseColumns::IS_FG_WAREHOUSE => $isFgWarehouse,
             ]);
 
             // Handle API Response
-            if ($this->wantsJson($request)) {
+            if ($request->wantsJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => Messages::WAREHOUSE_CREATED,
-                    'data' => new WarehouseResource($warehouse)
+                    'data' => $warehouse
                 ], 201);
             }
 
@@ -77,7 +85,7 @@ class WarehouseController extends Controller
             return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_CREATED);
             
         } catch (\Exception $e) {
-            if ($this->wantsJson($request)) {
+            if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => $e->getMessage()
@@ -104,7 +112,7 @@ class WarehouseController extends Controller
 
     public function getWarehouseById($id)
     {
-        $warehouse = (new Warehouse())->getWarehouseByID($id);
+        $warehouse = Warehouse::getWarehouseById($id);
 
         if (!$warehouse) {
             return abort(404, Messages::WAREHOUSE_NOT_FOUND);
@@ -140,6 +148,71 @@ class WarehouseController extends Controller
     public function deleteWarehouse($id)
     {
         return (new Warehouse)->deleteWarehouse($id);
+    }
+
+    /**
+     * Remove the specified warehouse from storage.
+     */
+    public function destroy(Request $request, $id)
+    {
+        $warehouse = Warehouse::getWarehouseById($id);
+
+        if (!$warehouse) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Messages::WAREHOUSE_NOT_FOUND
+                ], 404);
+            }
+            return redirect()->route('warehouses.index')->with('error', Messages::WAREHOUSE_NOT_FOUND);
+        }
+
+        // Validasi relasi dengan try-catch agar tidak error jika tabel belum ada
+        $stockExists = false;
+        $inventoryExists = false;
+        try {
+            // Check if warehouse has stock records
+            $stockExists = \DB::table('stock')->where('warehouse_id', $id)->exists();
+        } catch (\Exception $e) {
+            $stockExists = false;
+        }
+        try {
+            // Check if warehouse has inventory records
+            $inventoryExists = \DB::table('material_inventory')->where('warehouse_id', $id)->exists();
+        } catch (\Exception $e) {
+            $inventoryExists = false;
+        }
+
+        if ($stockExists || $inventoryExists) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Messages::WAREHOUSE_IN_USE
+                ], 422);
+            }
+            return redirect()->route('warehouses.index')->with('error', Messages::WAREHOUSE_IN_USE);
+        }
+
+        $deleted = Warehouse::deleteWarehouse($id);
+
+        if ($deleted) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => Messages::WAREHOUSE_DELETED
+                ]);
+            }
+            return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_DELETED);
+        }
+
+        // Gagal hapus warehouse (error lain)
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => Messages::WAREHOUSE_DELETE_FAILED
+            ], 422);
+        }
+        return redirect()->route('warehouses.index')->with('error', Messages::WAREHOUSE_DELETE_FAILED);
     }
 
     public function exportPdf()
@@ -189,21 +262,20 @@ class WarehouseController extends Controller
         return view('warehouse.index', compact('warehouses'));
     }
 
-        /**
-         * Update the specified warehouse in storage.
-         */
-        public function update(UpdateWarehouseRequest $request, $id)
-        {
-
-            try {
-                $updated = (new Warehouse())->updateWarehouse($id, [
-                    'warehouse_name' => $request->input('warehouse_name'),
-                    'warehouse_address' => $request->input('warehouse_address'),
-                    'warehouse_telephone' => $request->input('warehouse_telephone'),
-                    'is_rm_whouse' => $request->input('is_rm_whouse'),
-                    'is_fg_whouse' => $request->input('is_fg_whouse'),
-                    'is_active' => $request->input('is_active'),
-                ]);
+    /**
+        * Update the specified warehouse in storage.
+    */
+    public function update(UpdateWarehouseRequest $request, $id)
+    {
+        try {
+            $updated = (new Warehouse())->updateWarehouse($id, [
+                'warehouse_name' => $request->input('warehouse_name'),
+                'warehouse_address' => $request->input('warehouse_address'),
+                'warehouse_telephone' => $request->input('warehouse_telephone'),
+                'is_rm_whouse' => $request->input('is_rm_whouse'),
+                'is_fg_whouse' => $request->input('is_fg_whouse'),
+                'is_active' => $request->input('is_active'),
+            ]);
 
                 if ($updated) {
                     $warehouse = (new Warehouse())->getWarehouseById($id);
@@ -216,7 +288,7 @@ class WarehouseController extends Controller
                         ]);
                     }
                     // Web response
-                    return redirect()->route('warehouse.index')->with('success', Messages::WAREHOUSE_UPDATED);
+                    return redirect()->route('warehouses.index')->with('success', Messages::WAREHOUSE_UPDATED);
                 }
 
                 // Not found

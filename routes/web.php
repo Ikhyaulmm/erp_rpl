@@ -49,10 +49,10 @@ Route::get('/branches/add', function () {
     return view('branches.add');
 });
 
-# View Warehouse
-Route::get('/warehouse/index', function () {
-    return view('warehouse.index');
-})->name('warehouse.index');
+# View Warehouse (DEPRECATED - use warehouses.index instead)
+# Route::get('/warehouse/index', function () {
+#     return view('warehouse.index');
+# })->name('warehouse.index');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -241,6 +241,9 @@ Route::get('/supplier-pic/cetak-pdf/{supplierID}', [SupplierPiController::class,
 Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
 Route::get('/warehouses/create', [WarehouseController::class, 'create'])->name('warehouses.create');
 Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
+Route::get('/warehouses/{id}/edit', [WarehouseController::class, 'edit'])->name('warehouses.edit');
+Route::put('/warehouses/{id}', [WarehouseController::class, 'update'])->name('warehouses.update');
+Route::delete('/warehouses/{id}', [WarehouseController::class, 'destroy'])->name('warehouses.destroy');
 Route::get('/warehouse/detail/{id}', [WarehouseController::class, 'getWarehouseById'])->name('warehouse.detail');
 Route::get('/warehouse/search', [WarehouseController::class, 'searchWarehouse'])->name('warehouse.search');
 Route::delete('/warehouse/delete/{id}', [WarehouseController::class, 'deleteWarehouse'])->name('warehouse.delete');
@@ -266,16 +269,10 @@ Route::put('/assortment_production/update/{id}', [AssortProductionController::cl
 Route::get('/assortment_production/detail/{po_number}', [AssortProductionController::class, 'getProductionDetail']);
 Route::delete('/assort-production/{id}', [AssortProductionController::class, 'deleteProduction']);
 
-
-
-
-
-
 #Cetak PDF seluruh item/material yang dipasok oleh supplier tertentu
 Route::get('/supplier/{supplier_id}/cetak-pdf', [SupplierMaterialController::class, 'cetakPDF']);
 
 Route::get('/productions/search/{keyword}', [AssortProductionController::class, 'searchProduction']);
-
 
 #BillOfMaterial
 Route::delete('/bill-of-material/{id}', [BillOfMaterialController::class, 'deleteBillOfMaterial']);
