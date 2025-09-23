@@ -41,17 +41,13 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 # View Branches
-Route::get('/branches/index', function () {
-    return view('branches.index');
-})->name('branches.index');
+// Route::get('/branches', function () {
+//     return view('branches.index');
+// })->name('branches.index');
 
 Route::get('/branches/add', function () {
     return view('branches.add');
 });
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
 
 Route::get('/supplier/pic/add', function () {
     return view('supplier/pic/add');
@@ -60,6 +56,7 @@ Route::get('/supplier/pic/add', function () {
 Route::get('/supplier/add', function () {
     return view('supplier/add');
 });
+
 Route::get('/supplier/detail', function () {
     return view('supplier/detail');
 });
@@ -143,10 +140,22 @@ Route::get('/merks/{id}', [MerkController::class, 'show'])->name('merks.show');
 Route::get('/merks/{id}/edit', [MerkController::class, 'edit'])->name('merks.edit');
 Route::put('/merks/{id}', [MerkController::class, 'update'])->name('merks.update');
 Route::delete('/merks/{id}', [MerkController::class, 'destroy'])->name('merks.destroy');
-Route::get('/merks/{id}/detail', [MerkController::class, 'getMerkById'])->name('merks.detail.legacy');
-Route::post('/merks/add', [MerkController::class, 'addMerk'])->name('merks.add.legacy');
-Route::post('/merks/update/{id}', [MerkController::class, 'updateMerk'])->name('merks.update.legacy');
-Route::delete('/merks/delete/{id}', [MerkController::class, 'deleteMerk'])->name('merks.delete.legacy');
+// Route::get('/merks/{id}/detail', [MerkController::class, 'getMerkById'])->name('merks.detail.legacy');
+// Route::post('/merks/add', [MerkController::class, 'addMerk'])->name('merks.add.legacy');
+// Route::post('/merks/update/{id}', [MerkController::class, 'updateMerk'])->name('merks.update.legacy');
+// Route::delete('/merks/delete/{id}', [MerkController::class, 'deleteMerk'])->name('merks.delete.legacy');
+
+#Category
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+Route::get('/categories/{id}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/categories/search', [CategoryController::class, 'searchCategory']);
+Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
+Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+Route::get('/categories/parent/{parentId}', [CategoryController::class, 'getCategoryByParent']);
+Route::get('/categories/list', [CategoryController::class, 'getCategoryList'])->name('categories.list');
 
 # Product
 Route::get('/product/list', [ProductController::class, 'getProductList'])->name('product.list');
@@ -236,15 +245,6 @@ Route::get('/category/print', [CategoryController::class, 'printCategoryPDF'])->
 Route::get('/product/print/{type}', [ProductController::class, 'printProductsByType'])->name('product.print.type');
 // Cetak produk berdasarkan kategori tertentu 
 Route::get('/category/print/{id}', [ProductController::class, 'printCategoryByIdPDF'])->name('category.print.single');
-
-#Category
-Route::get('/category/search', [CategoryController::class, 'searchCategory']);
-Route::get('/category/edit/{id}', [CategoryController::class, 'updateCategoryById'])->name('category.edit');
-Route::put('/category/update/{id}', [CategoryController::class, 'updateCategory'])->name('category.update');
-Route::get('/category/{id}', [CategoryController::class, 'getCategoryById']);
-Route::delete('/category/delete/{id}', [CategoryController::class, 'deleteCategory'])->name('category.delete');
-Route::get('/category/parent/{parentId}', [CategoryController::class, 'getCategoryByParent']);
-Route::get('/category', [CategoryController::class, 'getCategoryList'])->name('category.list');
 
 #Supplier Pic
 Route::delete('/supplier/pic/delete/{id}', [SupplierPIController::class, 'deleteSupplierPIC'])->name('supplier.pic.delete');

@@ -16,7 +16,7 @@ class WarehouseColumns
 
     /**
      * Get fillable columns (exclude id, created_at, updated_at)
-     */    
+     */
     public static function getFillable(): array
     {
         return [

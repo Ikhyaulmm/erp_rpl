@@ -220,61 +220,61 @@ class Merk extends Model
      * These will be removed in future versions
      */
 
-    /**
-     * @deprecated Use getAllMerk() instead
-     */
-    public static function searchMerk($keyword)
-    {
-        return self::getAllMerk($keyword);
-    }
+    // /**
+    //  * @deprecated Use getAllMerk() instead
+    //  */
+    // public static function searchMerk($keyword)
+    // {
+    //     return self::getAllMerk($keyword);
+    // }
 
-    /**
-     * @deprecated Use direct Eloquent operations instead
-     */
-    public static function deleteMerk($id)
-    {
-        $merk = self::find($id);
-        return $merk ? $merk->delete() : false;
-    }
+    // /**
+    //  * @deprecated Use direct Eloquent operations instead
+    //  */
+    // public static function deleteMerk($id)
+    // {
+    //     $merk = self::find($id);
+    //     return $merk ? $merk->delete() : false;
+    // }
 
-    /**
-     * @deprecated Use direct Eloquent create() instead
-     */
-    public static function addMerk($namaMerk, $active = 1)
-    {
-        return self::create([
-            MerkColumns::NAME => $namaMerk,
-            MerkColumns::IS_ACTIVE => $active
-        ]);
-    }
+    // /**
+    //  * @deprecated Use direct Eloquent create() instead
+    //  */
+    // public static function addMerk($namaMerk, $active = 1)
+    // {
+    //     return self::create([
+    //         MerkColumns::NAME => $namaMerk,
+    //         MerkColumns::IS_ACTIVE => $active
+    //     ]);
+    // }
 
-    /**
-     * @deprecated Use direct Eloquent operations instead
-     */
-    public static function updateMerk($id, array $data)
-    {
-        $merk = self::find($id);
-        if (!$merk) {
-            return null;
-        }
+    // /**
+    //  * @deprecated Use direct Eloquent operations instead
+    //  */
+    // public static function updateMerk($id, array $data)
+    // {
+    //     $merk = self::find($id);
+    //     if (!$merk) {
+    //         return null;
+    //     }
         
-        $merk->update($data);
-        return $merk;
-    }
+    //     $merk->update($data);
+    //     return $merk;
+    // }
 
-    /**
-     * @deprecated Use getStatistics()['total_merk'] instead
-     */
-    public static function countMerek()
-    {
-        return self::count();
-    }
+    // /**
+    //  * @deprecated Use getStatistics()['total_merk'] instead
+    //  */
+    // public static function countMerek()
+    // {
+    //     return self::count();
+    // }
 
-    /**
-     * @deprecated Use find() directly instead
-     */
-    public function getMerkById($id)
-    {
-        return self::find($id);
-    }
+    // /**
+    //  * @deprecated Use find() directly instead
+    //  */
+    // public function getMerkById($id)
+    // {
+    //     return self::find($id);
+    // }
 }

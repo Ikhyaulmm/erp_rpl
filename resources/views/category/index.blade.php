@@ -3,7 +3,7 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>ERP RPL UAD | Filled Form Category</title>
+    <title>ERP RPL UAD | Dashboard</title>
     <!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="title" content="AdminLTE v4 | Dashboard" />
@@ -100,7 +100,7 @@
                   <div class="d-flex">
                     <div class="flex-shrink-0">
                       <img
-                        src={{asset("assets/dist/assets/img/user1-128x128.jpg")}}
+                        src="../../dist/assets/img/user1-128x128.jpg"
                         alt="User Avatar"
                         class="img-size-50 rounded-circle me-3"
                       />
@@ -108,9 +108,7 @@
                     <div class="flex-grow-1">
                       <h3 class="dropdown-item-title">
                         Brad Diesel
-                        <span class="float-end fs-7 text-danger"
-                          ><i class="bi bi-star-fill"></i
-                        ></span>
+                        <span class="float-end fs-7 text-danger"><i class="bi bi-star-fill"></i></span>
                       </h3>
                       <p class="fs-7">Call me whenever you can...</p>
                       <p class="fs-7 text-secondary">
@@ -126,7 +124,7 @@
                   <div class="d-flex">
                     <div class="flex-shrink-0">
                       <img
-                        src={{ asset("assets/dist/assets/img/user8-128x128.jpg") }}
+                        src="../../dist/assets/img/user8-128x128.jpg"
                         alt="User Avatar"
                         class="img-size-50 rounded-circle me-3"
                       />
@@ -134,9 +132,7 @@
                     <div class="flex-grow-1">
                       <h3 class="dropdown-item-title">
                         John Pierce
-                        <span class="float-end fs-7 text-secondary">
-                          <i class="bi bi-star-fill"></i>
-                        </span>
+                        <span class="float-end fs-7 text-secondary"> <i class="bi bi-star-fill"></i> </span>
                       </h3>
                       <p class="fs-7">I got your message bro</p>
                       <p class="fs-7 text-secondary">
@@ -152,7 +148,7 @@
                   <div class="d-flex">
                     <div class="flex-shrink-0">
                       <img
-                        src={{ asset("assets/dist/assets/img/user3-128x128.jpg") }}
+                        src="../../dist/assets/img/user3-128x128.jpg"
                         alt="User Avatar"
                         class="img-size-50 rounded-circle me-3"
                       />
@@ -160,9 +156,7 @@
                     <div class="flex-grow-1">
                       <h3 class="dropdown-item-title">
                         Nora Silvester
-                        <span class="float-end fs-7 text-warning">
-                          <i class="bi bi-star-fill"></i>
-                        </span>
+                        <span class="float-end fs-7 text-warning"> <i class="bi bi-star-fill"></i> </span>
                       </h3>
                       <p class="fs-7">The subject goes here</p>
                       <p class="fs-7 text-secondary">
@@ -217,17 +211,17 @@
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <img
-                  src={{ asset("assets/dist/assets/img/user2-160x160.jpg") }}
+                  src="../../dist/assets/img/user2-160x160.jpg"
                   class="user-image rounded-circle shadow"
                   alt="User Image"
                 />
-                <span class="d-none d-md-inline">Mimin Gantenk</span>
+                <span class="d-none d-md-inline">Alexander Pierce</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <!--begin::User Image-->
                 <li class="user-header text-bg-primary">
                   <img
-                    src={{ asset("assets/dist/assets/img/user2-160x160.jpg") }}
+                    src="../../dist/assets/img/user2-160x160.jpg"
                     class="rounded-circle shadow"
                     alt="User Image"
                   />
@@ -268,16 +262,16 @@
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
-          <a href="{{ route('dashboard') }}" class="brand-link">
+          <a href="../index.html" class="brand-link">
             <!--begin::Brand Image-->
             <img
-              src={{asset("assets/dist/assets/img/LogoRPL.png")}}
-              alt="RPL"
+              src="../../dist/assets/img/AdminLTELogo.png"
+              alt="AdminLTE Logo"
               class="brand-image opacity-75 shadow"
             />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">ERP RPL UAD</span>
+            <span class="brand-text fw-light">AdminLTE 4</span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -287,111 +281,95 @@
         <div class="sidebar-wrapper">
           <nav class="mt-2">
             <!--begin::Sidebar Menu-->
-          <ul
-            class="nav sidebar-menu flex-column"
-            data-lte-toggle="treeview"
-            role="menu"
-            data-accordion="false">
-            <li class="nav-item">
-              <a href="/dashboard" class="nav-link active">
-                <i class="nav-icon bi bi-speedometer"></i>
-                <p>
-                  Dashboard
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
+            <ul
+              class="nav sidebar-menu flex-column"
+              data-lte-toggle="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              <li class="nav-item menu-open">
+                <a href="{{ route('dashboard') }}" class="nav-link active">
+                  <i class="nav-icon bi bi-speedometer2"></i>
+                  <p>
+                    Dashboard
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
               <a href="{{ route('product.list') }}" class="nav-link">
-                <i class="nav-icon bi bi-box-seam-fill"></i>
-                <p>Produk</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="nav-icon bi bi-person-circle"></i>
-                <p>
-                  Supplier
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="/supplier/pic/add" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Tambah PIC supplier</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/supplier/material/add" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Tambah Supplier Item</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/supplier/add" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Tambah Supplier</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/supplier/material/list" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Supplier Material</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/supplier/pic/list" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>List PIC Supplier</p>
-                  <a href="/supplier/list" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>List Supplier</p>
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a href="{{ route('purchase.orders') }}" class="nav-link">
-                <i class="nav-icon bi bi-clipboard-fill"></i>
-                <p>
-                  Purchase Orders
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ route('branch.list') }}" class="nav-link">
-                <i class="nav-icon bi bi-clipboard-fill"></i>
-                <p>
-                  Branch
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
+                  <i class="nav-icon bi bi-box-seam-fill"></i>
+                  <p>Produk</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('categories.index') }}" class="nav-link">
+                  <i class="nav-icon bi bi-tags-fill"></i>
+                  <p>
+                    Category
+                  </p>
+                </a>                
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('merk.index') }}" class="nav-link">
+                  <i class="nav-icon bi bi-award-fill"></i>
+                  <p>
+                    Merk
+                  </p>
+                </a>                
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-person-circle"></i>
+                  <p>
+                    Supplier
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="./widgets/small-box.html" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Small Box</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/supplier/pic/add" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Tambah PIC supplier</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="./widgets/cards.html" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Cards</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('purchase.orders') }}" class="nav-link">
+                  <i class="nav-icon bi bi-clipboard-fill"></i>
+                  <p>
+                    Purchase Orders
+                  </p>
+                </a>                
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('branches.index') }}" class="nav-link">
+                  <i class="nav-icon bi bi-building"></i>
+                  <p>
+                    Branch
+                  </p>
+                </a>                
+              </li>
+              <li class="nav-item">
               <a href="{{ route('item.list') }}" class="nav-link">
-                <i class="nav-icon bi bi-clipboard-fill"></i>
-                <p>
-                  Item
-                </p>
-              </a>
-            </li>
-            <li class="nav-item"><!--Tambah Bill Of Material-->
-              <a href="#" class="nav-link">
-                <i class="nav-icon bi bi-clipboard-fill"></i>
-                <p>
-                  Production
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="/bom/list" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Bill Of Material</p>
-                  </a>
-                </li>
-              </ul>
-
-            </li>
-          </ul>
-          <!--end::Sidebar Menu-->
+              <i class="nav-icon bi bi-clipboard-fill"></i>
+                      <p>Item</p>
+                    </a>
+                  </li>
+            </ul>
+            <!--end::Sidebar Menu-->
           </nav>
         </div>
         <!--end::Sidebar Wrapper-->
@@ -404,12 +382,17 @@
           <!--begin::Container-->
           <div class="container-fluid">
             <!--begin::Row-->
-            <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">Filled Form Category</h3></div>
+            <div class="row align-items-center">
+              <div class="col-sm-6 d-flex align-items-center">
+                <h3 class="mb-0 me-2">Category</h3>
+                <a href="{{ route('categories.create') }}" class="btn btn-primary btn-sm">Tambah</a>
+                <a href="{{ route('categories.index', ['export' => 'pdf']) }}" class="btn btn-primary btn-sm ms-2">Cetak Category</a>
+              </div>
+    
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                   <li class="breadcrumb-item"><a href="#">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Edit Category</li>
+                  <li class="breadcrumb-item active" aria-current="page">Category</li>
                 </ol>
               </div>
             </div>
@@ -417,61 +400,100 @@
           </div>
           <!--end::Container-->
         </div>
-        <!--end::App Content Header-->
-        <!--begin::App Content-->
-        <div class="app-content">
-          <!--begin::Container-->
-          <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-                <div class="container">
-                <!-- Filled Form Supplier -->
-                 @if(session('success'))
-        <div class="alert alert-success">
-          {{ session('success') }}
+
+        <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                      <h3 class="card-title">List Table</h3>
+                      <form action="{{ route('categories.index') }}" method="GET" class="d-flex ms-auto">
+                        <!-- Search bar berada di ujung kanan -->
+                        <div class="input-group input-group-sm ms-auto" style="width: 450px;">
+                          <input type="text" name="search" class="form-control" placeholder="Search Category" value="{{ $search ?? '' }}">
+                          <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                              <i class="bi bi-search"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    @if(session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                    @endif
+                    <table class="table table-bordered">
+                      <thead class="text-center">
+                        <tr>
+                          <th style="width: 10px">ID</th>
+                          <th>Category Name</th>
+                          <th>Parent Category</th>
+                          <th>Active</th>
+                          <th>Created At</th>
+                          <th>Updated At</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                            @forelse($categories as $category)
+                            <tr>
+                            <td>{{ $category->id }}</td>
+                            <td>
+                                <a href="{{ route('categories.show', $category->id) }}" style="color: inherit; text-decoration: none;">
+                                    {{ $category->category }}
+                                </a>
+                            </td>
+                            <td>{{ $category->parent->category ?? 'No Parent' }}</td>
+                            <td class="text-center">
+                                 @if($category->is_active == 1)
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                @else
+                                        <i class="bi bi-x-circle-fill text-danger"></i>
+                                  @endif
+                           </td>
+                            <td>{{ $category->created_at }}</td>
+                            <td>{{ $category->updated_at }}</td>
+                            <td>
+                <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-sm btn-danger" dusk="delete-category-{{ $category->id }}">Delete</button>
+                </form>
+                <a href="{{ route('categories.show', $category->id) }}" class="btn btn-info">Detail</a>
+
+                            </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center">No data available in table</td>
+                            </tr>
+                            @endforelse
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /.card-body -->
+                  <div class="card-footer clearfix">
+                  {{ $categories->links('pagination::bootstrap-4') }}
+                  </div>
+
         </div>
-      @endif
-
-      @if(isset($error))
-        <div class="alert alert-danger">
-            {{ $error }}
-        </div>
-      @endif
-      @if($category)
-        <form method="POST" action="{{ route('categories.update', $category->id) }}">
-            @csrf
-            @method('PUT')
-
-            <div class="mb-3">
-                <label class="form-label">Category ID</label>
-                <input type="number" class="form-control" value="{{ $category->id }}" disabled>
-                <input type="hidden" name="id" value="{{ $category->id }}">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Category Name</label>
-                <input type="text" name="category" class="form-control" value="{{ old('category', $category->category) }}" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Parent ID</label>
-                <input type="number" name="parent_id" class="form-control" value="{{ old('parent_id', $category->parent_id) }}">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Active</label>
-                <input type="boolean" name="active" class="form-control" value="{{ old('active', $category->active) }}" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Update</button>
-            <a href="{{ url()->current() }}" class="btn btn-secondary">Batal</a>
-        </form>
-      @endif
-          </div>
-        </div>
+        
       </main>
+      <!--end::App Main-->
+      <!--begin::Footer-->
       <footer class="app-footer">
+        <!--begin::To the end-->
         <div class="float-end d-none d-sm-inline">Anything you want</div>
+        <!--end::To the end-->
+        <!--begin::Copyright-->
         <strong>
           Copyright &copy; 2014-2024&nbsp;
           <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
@@ -481,6 +503,10 @@
       </footer>
       <!--end::Footer-->
     </div>
+    <!--end::App Wrapper-->
+
+    <!--begin::Script-->
+    <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
       integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
@@ -499,7 +525,7 @@
       crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="../../dist/js/adminlte.js"></script>
+    <script src="{{ asset('assets/dist/js/adminlte.js') }}"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
       const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
@@ -529,108 +555,6 @@
       integrity="sha256-ipiJrswvAR4VAx/th+6zWsdeYmVae0iJuiR+6OqHJHQ="
       crossorigin="anonymous"
     ></script>
-    <!-- sortablejs -->
-    <script>
-      const connectedSortables = document.querySelectorAll('.connectedSortable');
-      connectedSortables.forEach((connectedSortable) => {
-        let sortable = new Sortable(connectedSortable, {
-          group: 'shared',
-          handle: '.card-header',
-        });
-      });
-      const cardHeaders = document.querySelectorAll('.connectedSortable .card-header');
-      cardHeaders.forEach((cardHeader) => {
-        cardHeader.style.cursor = 'move';
-      });
-    </script>
-    <!-- apexcharts -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
-      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
-      crossorigin="anonymous"
-    ></script>
-    <!-- ChartJS -->
-    <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
-      const sales_chart_options = {
-        series: [
-          {
-            name: 'Digital Goods',
-            data: [28, 48, 40, 19, 86, 27, 90],
-          },
-          {
-            name: 'Electronics',
-            data: [65, 59, 80, 81, 56, 55, 40],
-          },
-        ],
-        chart: {
-          height: 300,
-          type: 'area',
-          toolbar: {
-            show: false,
-          },
-        },
-        legend: {
-          show: false,
-        },
-        colors: ['#0d6efd', '#20c997'],
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: 'smooth',
-        },
-        xaxis: {
-          type: 'datetime',
-          categories: [
-            '2023-01-01',
-            '2023-02-01',
-            '2023-03-01',
-            '2023-04-01',
-            '2023-05-01',
-            '2023-06-01',
-            '2023-07-01',
-          ],
-        },
-        tooltip: {
-          x: {
-            format: 'MMMM yyyy',
-          },
-        },
-      };
-      const sales_chart = new ApexCharts(
-        document.querySelector('#revenue-chart'),
-        sales_chart_options,
-      );
-      sales_chart.render();
-    </script>
-    <!-- jsvectormap -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
-      integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
-      integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
-      crossorigin="anonymous"
-    ></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- AdminLTE JS -->
-    <script src={{ asset("assets/dist/js/adminlte.js")}}></script>
-    <!-- Custom Sidebar Toggle Script -->
-    <script>
-    $(document).ready(function () {
-        $('[data-widget="pushmenu"]').on('click', function (e) {
-            e.preventDefault();
-            $('body').toggleClass('sidebar-collapse');
-        });
-    });
-    </script>
-  </script>
-    </script>
+    <!--end::Script-->
   </body>
 </html>
