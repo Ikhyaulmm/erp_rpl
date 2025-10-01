@@ -48,8 +48,21 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-    - name: Generate key
-      run: php artisan key:generate
+    - name: Clear Laravel caches
+      run: |
+        php artisan config:clear || echo "Config cache clear failed or not needed"
+        php artisan route:clear || echo "Route cache clear failed or not needed"
+        php artisan view:clear || echo "View cache clear failed or not needed"
+
+    - name: Generate application key
+      run: |
+        if php artisan key:generate; then
+          echo "Application key generated successfully"
+        else
+          echo "Failed to generate key, trying alternative method..."
+          php -r "echo 'base64:' . base64_encode(random_bytes(32));" > /tmp/key
+          sed -i "s/APP_KEY=/APP_KEY=$(cat /tmp/key)/" .env
+        fi
 
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
@@ -124,8 +137,21 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-    - name: Generate key
-      run: php artisan key:generate
+    - name: Clear Laravel caches
+      run: |
+        php artisan config:clear || echo "Config cache clear failed or not needed"
+        php artisan route:clear || echo "Route cache clear failed or not needed"
+        php artisan view:clear || echo "View cache clear failed or not needed"
+
+    - name: Generate application key
+      run: |
+        if php artisan key:generate; then
+          echo "Application key generated successfully"
+        else
+          echo "Failed to generate key, trying alternative method..."
+          php -r "echo 'base64:' . base64_encode(random_bytes(32));" > /tmp/key
+          sed -i "s/APP_KEY=/APP_KEY=$(cat /tmp/key)/" .env
+        fi
 
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
