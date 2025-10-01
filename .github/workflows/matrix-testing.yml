@@ -2,9 +2,9 @@ name: Matrix Testing
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, development ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main, dev, development ]
 
 jobs:
   test-matrix:

@@ -2,9 +2,9 @@ name: Laravel CI/CD
 
 on:
   push:
-    branches: [ main, dev, staging ]
+    branches: [ main, dev, development, staging ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main, dev, development ]
 
 jobs:
   test:
@@ -158,7 +158,7 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     needs: [test, code-quality, security]
-    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/development') && github.event_name == 'push'
     
     steps:
     - uses: actions/checkout@v4
