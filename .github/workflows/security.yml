@@ -28,7 +28,7 @@ jobs:
       run: composer audit --format=json > security-audit.json || true
 
     - name: Upload security audit results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-audit
         path: security-audit.json

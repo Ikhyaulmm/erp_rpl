@@ -66,7 +66,7 @@ jobs:
         fi
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: unittests
@@ -74,7 +74,7 @@ jobs:
         fail_ci_if_error: false
 
     - name: Upload coverage HTML
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-html
         path: coverage-html/
@@ -101,7 +101,7 @@ jobs:
         curl -s "https://img.shields.io/badge/Coverage-${COVERAGE}%25-${COLOR}" > coverage-badge.svg
 
     - name: Upload coverage badge
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-badge
         path: coverage-badge.svg
