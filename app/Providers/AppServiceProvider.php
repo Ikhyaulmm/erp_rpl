@@ -13,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register Dusk in non-production environments
         if ($this->app->environment('local', 'testing')) {
-            $this->app->register(\Laravel\Dusk\DuskServiceProvider::class);
+           // $this->app->register(\Laravel\Dusk\DuskServiceProvider::class);
         }
     }
 
