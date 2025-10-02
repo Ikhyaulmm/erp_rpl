@@ -190,7 +190,7 @@ class ProductControllerTest extends TestCase
         
         // Assert view data
         $viewProduct = $response->viewData('product');
-        $this->assertEquals($productType, $viewProduct->type);
+        $this->assertEquals($productType, $viewProduct->type->value); // Compare with enum value
     }
 
     /**
