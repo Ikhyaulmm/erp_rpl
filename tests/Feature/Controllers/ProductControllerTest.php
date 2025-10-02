@@ -126,15 +126,15 @@ class ProductControllerTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            ProductColumns::PRODUCT_ID => 'ELEC-001',
+            ProductColumns::PRODUCT_ID => 'EL01',
             ProductColumns::NAME => 'Smartphone Test',
             ProductColumns::TYPE => 'FG',
             ProductColumns::CATEGORY => $category->id,
             ProductColumns::DESC => 'Latest smartphone model',
         ]);
 
-        // Encrypt the product ID
-        $encryptedId = EncryptionHelper::encrypt($product->id);
+        // Encrypt the product ID (use product_id, not auto-increment id)
+        $encryptedId = EncryptionHelper::encrypt($product->product_id);
 
         // Act - Visit the product detail page
         $response = $this->get(route('product.detail', $encryptedId));
@@ -145,12 +145,12 @@ class ProductControllerTest extends TestCase
         
         // Assert product and category data
         $response->assertSee('Smartphone Test');
-        $response->assertSee('ELEC-001');
+        $response->assertSee('EL01');
         $response->assertSee('Latest smartphone model');
         
         // Assert view data contains product with proper category
         $viewProduct = $response->viewData('product');
-        $this->assertEquals($product->id, $viewProduct->id);
+        $this->assertEquals($product->product_id, $viewProduct->product_id);
         $this->assertEquals($category->id, $viewProduct->category);
     }
 
@@ -168,15 +168,15 @@ class ProductControllerTest extends TestCase
 
         // Create product with specific type
         $product = Product::factory()->create([
-            ProductColumns::PRODUCT_ID => 'TYPE-' . uniqid(),
+            ProductColumns::PRODUCT_ID => 'T' . substr(uniqid(), -3),
             ProductColumns::NAME => 'Product ' . $productType,
             ProductColumns::TYPE => $productType,
             ProductColumns::CATEGORY => $category->id,
             ProductColumns::DESC => $description,
         ]);
 
-        // Encrypt the product ID
-        $encryptedId = EncryptionHelper::encrypt($product->id);
+        // Encrypt the product ID (use product_id, not auto-increment id)
+        $encryptedId = EncryptionHelper::encrypt($product->product_id);
 
         // Act - Visit the product detail page
         $response = $this->get(route('product.detail', $encryptedId));
@@ -217,15 +217,15 @@ class ProductControllerTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            ProductColumns::PRODUCT_ID => 'INACTIVE-001',
+            ProductColumns::PRODUCT_ID => 'IN01',
             ProductColumns::NAME => 'Inactive Product',
             ProductColumns::TYPE => 'FG',
             ProductColumns::CATEGORY => $category->id,
             ProductColumns::DESC => 'This product is inactive',
         ]);
 
-        // Encrypt the product ID
-        $encryptedId = EncryptionHelper::encrypt($product->id);
+        // Encrypt the product ID (use product_id, not auto-increment id)
+        $encryptedId = EncryptionHelper::encrypt($product->product_id);
 
         // Act - Visit the product detail page
         $response = $this->get(route('product.detail', $encryptedId));
@@ -234,7 +234,7 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('product.detail');
         $response->assertSee('Inactive Product');
-        $response->assertSee('INACTIVE-001');
+        $response->assertSee('IN01');
         
         // Assert view data
         $viewProduct = $response->viewData('product');
