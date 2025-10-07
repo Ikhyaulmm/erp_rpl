@@ -4,25 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Constants\ItemColumns;
 use Exception;
 
 class Item extends Model
 {
     use HasFactory;
     
-    protected $table = 'item';
-    protected $fillable = [
-        'product_id', 'sku', 'item_name', 'measurement_unit',
-        'avg_base_price', 'selling_price', 'purchase_unit',
-        'sell_unit', 'stock_unit'
-    ];
+    protected $table;
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
-        $this->table = config('db_constants.table.item');
-        $this->fillable = array_values(config('db_constants.column.item') ?? []);
+        // Use table name from config
+        $this->table = config('db_tables.item', 'items');
+        
+        // Use fillable columns from ItemColumns constant
+        $this->fillable = ItemColumns::getFillable();
     }
 
     // Relasi berdasarkan sku

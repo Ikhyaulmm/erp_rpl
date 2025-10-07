@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Item;
 use App\Models\Product;
 use App\Models\MeasurementUnit;
+use App\Constants\ItemColumns;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemFactory extends Factory
@@ -14,21 +15,21 @@ class ItemFactory extends Factory
     public function definition()
     {
         return [
-            'product_id' => function () {
+            ItemColumns::PROD_ID => function () {
                 // Use existing product or create one
                 return Product::inRandomOrder()->value('product_id') ?? Product::factory()->create()->product_id;
             },
-            'sku' => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
-            'item_name' => $this->faker->words(3, true),
-            'measurement_unit' => function () {
+            ItemColumns::SKU => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
+            ItemColumns::NAME => $this->faker->words(3, true),
+            ItemColumns::MEASUREMENT => function () {
                 // Use existing measurement unit or default to 1
                 return MeasurementUnit::inRandomOrder()->value('id') ?? 1;
             },
-            'avg_base_price' => $this->faker->randomFloat(2, 1000, 100000),
-            'selling_price' => $this->faker->randomFloat(2, 1500, 150000),
-            'purchase_unit' => $this->faker->randomElement(['pcs', 'kg', 'box', 'liter']),
-            'sell_unit' => $this->faker->randomElement(['pcs', 'kg', 'box', 'liter']),
-            'stock_unit' => $this->faker->numberBetween(0, 1000),
+            ItemColumns::BASE_PRICE => $this->faker->numberBetween(1000, 100000),
+            ItemColumns::SELLING_PRICE => $this->faker->numberBetween(1500, 150000),
+            ItemColumns::PURCHASE_UNIT => 30, // Default unit ID for pieces
+            ItemColumns::SELL_UNIT => 30, // Default unit ID for pieces  
+            ItemColumns::STOCK_UNIT => $this->faker->numberBetween(0, 1000),
         ];
     }
 
