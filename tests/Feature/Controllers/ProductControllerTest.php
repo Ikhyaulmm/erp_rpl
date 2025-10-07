@@ -8,6 +8,7 @@ use Tests\TestCase;
 use App\Models\Product;
 use App\Models\Category;
 use App\Constants\ProductColumns;
+use App\Constants\Messages;
 use App\Helpers\EncryptionHelper;
 
 class ProductControllerTest extends TestCase
@@ -83,7 +84,7 @@ class ProductControllerTest extends TestCase
 
         // Assert 404 response
         $response->assertStatus(404);
-        $response->assertSee('Product tidak ditemukan');
+        $response->assertSee(Messages::PRODUCT_NOT_FOUND); // Updated: menggunakan konstanta Messages
     }
 
     /**
