@@ -30,14 +30,14 @@ class ItemTest extends BaseTestCase
         // Arrange - Create test item
         $item = Item::factory()->create([
             'sku' => 'TEST-001',
-            'item_name' => 'Test Item for Deletion',
+            'name' => 'Test Item for Deletion',
             'product_id' => 'PROD',
-            'measurement_unit' => 1,
-            'avg_base_price' => 10000,
+            'measurement' => 1,
+            'base_price' => 10000,
             'selling_price' => 15000,
-            'purchase_unit' => 'pcs',
-            'sell_unit' => 'pcs',
-            'stock_unit' => 'pcs'
+            'purchase_unit' => 30,
+            'sell_unit' => 30,
+            'stock_unit' => 100
         ]);
 
         $itemId = $item->id;
@@ -47,7 +47,7 @@ class ItemTest extends BaseTestCase
 
         // Assert - Item should be deleted successfully
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('item', ['id' => $itemId]);
+        $this->assertDatabaseMissing('items', ['id' => $itemId]);
         $this->assertNull(Item::find($itemId));
     }
 
@@ -74,9 +74,9 @@ class ItemTest extends BaseTestCase
         // Arrange - Create item with purchase order relation
         $item = Item::factory()->create([
             'sku' => 'TEST-002',
-            'item_name' => 'Test Item with Relations',
+            'name' => 'Test Item with Relations',
             'product_id' => 'PROD',
-            'measurement_unit' => 1
+            'measurement' => 1
         ]);
 
         // Create purchase order detail that references this item
@@ -95,7 +95,7 @@ class ItemTest extends BaseTestCase
         Item::deleteItemById($item->id);
 
         // Assert - Item should still exist
-        $this->assertDatabaseHas('item', ['id' => $item->id]);
+        $this->assertDatabaseHas('items', ['id' => $item->id]);
     }
 
     /**
@@ -106,17 +106,17 @@ class ItemTest extends BaseTestCase
         // Arrange - Create multiple items with sequential IDs
         $item1 = Item::factory()->create([
             'sku' => 'TEST-001',
-            'item_name' => 'Item 1'
+            'name' => 'Item 1'
         ]);
         
         $item2 = Item::factory()->create([
             'sku' => 'TEST-002', 
-            'item_name' => 'Item 2'
+            'name' => 'Item 2'
         ]);
         
         $item3 = Item::factory()->create([
             'sku' => 'TEST-003',
-            'item_name' => 'Item 3'
+            'name' => 'Item 3'
         ]);
 
         $originalItem2Id = $item2->id;
@@ -127,7 +127,7 @@ class ItemTest extends BaseTestCase
 
         // Assert - Deletion successful
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('item', ['id' => $item1->id]);
+        $this->assertDatabaseMissing('items', ['id' => $item1->id]);
 
         // Assert - Subsequent items should have decremented IDs
         $item2->refresh();
@@ -175,12 +175,12 @@ class ItemTest extends BaseTestCase
         // Arrange - Create items where we'll delete the last one
         $item1 = Item::factory()->create([
             'sku' => 'TEST-001',
-            'item_name' => 'Item 1'
+            'name' => 'Item 1'
         ]);
         
         $item2 = Item::factory()->create([
             'sku' => 'TEST-002',
-            'item_name' => 'Item 2 (to be deleted)'
+            'name' => 'Item 2 (to be deleted)'
         ]);
 
         $originalItem1Id = $item1->id;
@@ -190,12 +190,12 @@ class ItemTest extends BaseTestCase
 
         // Assert - Deletion successful
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('item', ['id' => $item2->id]);
+        $this->assertDatabaseMissing('items', ['id' => $item2->id]);
 
         // Assert - Previous item should remain unchanged
         $item1->refresh();
         $this->assertEquals($originalItem1Id, $item1->id);
-        $this->assertDatabaseHas('item', [
+        $this->assertDatabaseHas('items', [
             'id' => $originalItem1Id,
             'sku' => 'TEST-001'
         ]);
@@ -209,14 +209,14 @@ class ItemTest extends BaseTestCase
         // Arrange - Create test items with specific data
         $item1 = Item::factory()->create([
             'sku' => 'PRESERVE-001',
-            'item_name' => 'Item to Delete',
-            'avg_base_price' => 5000
+            'name' => 'Item to Delete',
+            'base_price' => 5000
         ]);
         
         $item2 = Item::factory()->create([
             'sku' => 'PRESERVE-002',
-            'item_name' => 'Item to Keep',
-            'avg_base_price' => 10000
+            'name' => 'Item to Keep',
+            'base_price' => 10000
         ]);
 
         // Act - Delete first item
@@ -228,8 +228,8 @@ class ItemTest extends BaseTestCase
         // Check remaining item data integrity
         $remainingItem = Item::where('sku', 'PRESERVE-002')->first();
         $this->assertNotNull($remainingItem);
-        $this->assertEquals('Item to Keep', $remainingItem->item_name);
-        $this->assertEquals(10000, $remainingItem->avg_base_price);
+        $this->assertEquals('Item to Keep', $remainingItem->name);
+        $this->assertEquals(10000, $remainingItem->base_price);
         $this->assertEquals('PRESERVE-002', $remainingItem->sku);
     }
 }
