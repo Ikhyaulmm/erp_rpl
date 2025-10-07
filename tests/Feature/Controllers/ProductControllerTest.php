@@ -84,7 +84,7 @@ class ProductControllerTest extends TestCase
 
         // Assert 404 response
         $response->assertStatus(404);
-        $response->assertSee(Messages::PRODUCT_NOT_FOUND); // Updated: menggunakan konstanta Messages
+        $response->assertSee(Messages::PRODUCT_NOT_FOUND);
     }
 
     /**
