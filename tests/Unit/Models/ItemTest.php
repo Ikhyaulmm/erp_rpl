@@ -127,14 +127,28 @@ class ItemTest extends BaseTestCase
 
         // Assert - Deletion successful
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('items', ['id' => $item1->id]);
+        
+        // Assert - Item 1 (by SKU) should be deleted
+        $this->assertDatabaseMissing('items', ['sku' => 'TEST-001']);
+        
+        // Assert - Only 2 items remain
+        $this->assertEquals(2, Item::count());
 
         // Assert - Subsequent items should have decremented IDs
-        $item2->refresh();
-        $item3->refresh();
+        // Query items by SKU instead of refresh (because ID has changed)
+        $updatedItem2 = Item::where('sku', 'TEST-002')->first();
+        $updatedItem3 = Item::where('sku', 'TEST-003')->first();
         
-        $this->assertEquals($originalItem2Id - 1, $item2->id);
-        $this->assertEquals($originalItem3Id - 1, $item3->id);
+        $this->assertEquals($originalItem2Id - 1, $updatedItem2->id);
+        $this->assertEquals($originalItem3Id - 1, $updatedItem3->id);
+        
+        // Assert - Item 2 now has ID 1
+        $this->assertEquals(1, $updatedItem2->id);
+        $this->assertDatabaseHas('items', ['id' => 1, 'sku' => 'TEST-002']);
+        
+        // Assert - Item 3 now has ID 2
+        $this->assertEquals(2, $updatedItem3->id);
+        $this->assertDatabaseHas('items', ['id' => 2, 'sku' => 'TEST-003']);
     }
 
     /**
