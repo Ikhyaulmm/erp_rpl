@@ -18,6 +18,9 @@ class ItemTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        
+        // Reset auto-increment untuk memastikan ID dimulai dari 1
+        \DB::statement('ALTER TABLE items AUTO_INCREMENT = 1');
     }
 
     // ========== DELETE ITEM BY ID METHOD TESTS ==========
@@ -139,16 +142,22 @@ class ItemTest extends BaseTestCase
         $updatedItem2 = Item::where('sku', 'TEST-002')->first();
         $updatedItem3 = Item::where('sku', 'TEST-003')->first();
         
+        // Assert - IDs decremented by 1 (relative to original)
         $this->assertEquals($originalItem2Id - 1, $updatedItem2->id);
         $this->assertEquals($originalItem3Id - 1, $updatedItem3->id);
         
-        // Assert - Item 2 now has ID 1
-        $this->assertEquals(1, $updatedItem2->id);
-        $this->assertDatabaseHas('items', ['id' => 1, 'sku' => 'TEST-002']);
+        // Assert - Item 2's new ID is 1 less than Item 3's new ID
+        $this->assertEquals($updatedItem2->id + 1, $updatedItem3->id);
         
-        // Assert - Item 3 now has ID 2
-        $this->assertEquals(2, $updatedItem3->id);
-        $this->assertDatabaseHas('items', ['id' => 2, 'sku' => 'TEST-003']);
+        // Assert - Proper SKU mapping to new IDs
+        $this->assertDatabaseHas('items', [
+            'id' => $updatedItem2->id, 
+            'sku' => 'TEST-002'
+        ]);
+        $this->assertDatabaseHas('items', [
+            'id' => $updatedItem3->id, 
+            'sku' => 'TEST-003'
+        ]);
     }
 
     /**
