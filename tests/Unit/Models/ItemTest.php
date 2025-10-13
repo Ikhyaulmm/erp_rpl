@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\PurchaseOrderDetail;
 use App\Models\Product;
 use App\Models\MeasurementUnit;
+use App\Constants\Messages;
 use Exception;
 use Tests\TestCase as BaseTestCase;
 
@@ -93,7 +94,7 @@ class ItemTest extends BaseTestCase
 
         // Act & Assert - Should throw exception
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Item tidak bisa dihapus karena sudah digunakan di purchase order.');
+        $this->expectExceptionMessage(Messages::ITEM_IN_USE);
 
         Item::deleteItemById($item->id);
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Constants\ItemColumns;
+use App\Constants\Messages;
 use Exception;
 
 class Item extends Model
@@ -63,7 +64,7 @@ class Item extends Model
 
         // Cek relasi berdasarkan SKU
         if ($item->purchaseOrderDetails()->exists()) {
-            throw new Exception("Item tidak bisa dihapus karena sudah digunakan di purchase order.");
+            throw new Exception(Messages::ITEM_IN_USE);
         }
 
         $item->delete();
