@@ -62,6 +62,9 @@ class Messages
 
     // Item messages
     public const ITEM_IN_USE = 'Item tidak bisa dihapus karena sudah digunakan di purchase order.';
+  
+    // Product messages
+    public const PRODUCT_NOT_FOUND = 'Produk tidak ditemukan';
 
     // General
     public const ACTION_FAILED = 'Aksi gagal dilakukan!';
