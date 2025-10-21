@@ -60,6 +60,9 @@ class Messages
     public const CATEGORY_NAME_TOO_SHORT = 'Nama kategori minimal 3 karakter!';
     public const CATEGORY_NAME_INVALID = 'Nama kategori hanya boleh berisi huruf, angka, spasi, dash, underscore, dan titik!';
 
+    // Product messages
+    public const PRODUCT_NOT_FOUND = 'Produk tidak ditemukan';
+
     // Item messages
     public const ITEM_IN_USE = 'Item tidak bisa dihapus karena sudah digunakan di purchase order.';
 
