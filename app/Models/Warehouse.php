@@ -39,6 +39,7 @@ class Warehouse extends Model
         return $warehouse->update($data);
     }
     public function searchWarehouse($keyword)
+    //perubahan pemanggilan
     {
         return self::where(function ($query) use ($keyword) {
             $query->where('warehouse_name', 'like', "%{$keyword}%")
