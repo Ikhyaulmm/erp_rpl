@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Feature\Controllers;
 
 use Tests\TestCase;
 use App\Models\SupplierPICModel;
