@@ -17,7 +17,7 @@ class WarehouseFactory extends Factory
      * @var string
      */
     protected $model = Warehouse::class;
-
+    
     /**
      * Define the model's default state.
      *

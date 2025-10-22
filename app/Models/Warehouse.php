@@ -10,7 +10,7 @@ use App\Constants\WarehouseColumns;
 class Warehouse extends Model
 {
     use HasFactory;
-    
+
     protected $table;
     protected $fillable = [];
 
@@ -38,6 +38,14 @@ class Warehouse extends Model
 
     public static function addWarehouse($data)
     {
+        if (empty($data)) {
+            throw new \Exception('Data tidak boleh kosong.');
+        }
+
+        if (is_object($data)) {
+            $data = (array) $data;
+        }
+
         return self::create($data);
     }
 
@@ -49,6 +57,16 @@ class Warehouse extends Model
     public static function countWarehouse()
     {
         return self::count();
+    }
+
+    public static function countActiveWarehouse()
+    {
+        return self::where(WarehouseColumns::IS_ACTIVE, 1)->count();
+    }
+
+    public static function countInactiveWarehouse()
+    {
+        return self::where(WarehouseColumns::IS_ACTIVE, 0)->count();
     }
 
     public function updateWarehouse($id, $data)
@@ -72,11 +90,39 @@ class Warehouse extends Model
     }
 
     /**
-     * Static method for deleting warehouse (consistent with Branch model)
+     * Static method for deleting warehouse with checks
      */
     public static function deleteWarehouse($id)
     {
-        return self::where(WarehouseColumns::ID, $id)->delete();
+        $warehouse = self::getWarehouseById($id);
+
+        if (!$warehouse) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Warehouse tidak ditemukan.',
+            ]);
+        }
+
+        // Cek apakah warehouse digunakan di tabel assortment_production
+        $usedInAssortment = DB::table('assortment_production')
+            ->where('rm_whouse_id', $id)
+            ->orWhere('fg_whouse_id', $id)
+            ->exists();
+
+        if ($usedInAssortment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Warehouse tidak dapat dihapus karena sedang digunakan di tabel assortment_production.',
+            ], 400);
+        }
+
+        // Lakukan penghapusan
+        $warehouse->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Warehouse berhasil dihapus.',
+        ]);
     }
 
     /**
@@ -120,7 +166,7 @@ class Warehouse extends Model
         // Sorting
         $sortBy = $filters['sort_by'] ?? WarehouseColumns::CREATED_AT;
         $sortOrder = $filters['sort_order'] ?? 'desc';
-        
+
         $query->orderBy($sortBy, $sortOrder);
 
         return $query;
