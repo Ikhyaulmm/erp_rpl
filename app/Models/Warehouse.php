@@ -90,42 +90,6 @@ class Warehouse extends Model
     }
 
     /**
-     * Static method for deleting warehouse with checks
-     */
-    public static function deleteWarehouse($id)
-    {
-        $warehouse = self::getWarehouseById($id);
-
-        if (!$warehouse) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Warehouse tidak ditemukan.',
-            ]);
-        }
-
-        // Cek apakah warehouse digunakan di tabel assortment_production
-        $usedInAssortment = DB::table('assortment_production')
-            ->where('rm_whouse_id', $id)
-            ->orWhere('fg_whouse_id', $id)
-            ->exists();
-
-        if ($usedInAssortment) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Warehouse tidak dapat dihapus karena sedang digunakan di tabel assortment_production.',
-            ], 400);
-        }
-
-        // Lakukan penghapusan
-        $warehouse->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Warehouse berhasil dihapus.',
-        ]);
-    }
-
-    /**
      * Search warehouses with filters (for API endpoints)
      */
     public static function searchWithFilters($filters = [])
