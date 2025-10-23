@@ -37,7 +37,7 @@ class SupplierController extends Controller
     {
         $sup = (new Supplier())->getSupplierById($id);
 
-        return view('Supplier.detail', compact('sup'));
+        return view('supplier.detail', compact('sup'));
     }
 
     public function searchSuppliers(Request $request)
