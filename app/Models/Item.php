@@ -7,7 +7,7 @@ use Exception;
 
 class Item extends Model
 {
-    protected $table = 'item';
+    protected $table = 'items';
     protected $fillable = [
         'product_id', 'sku', 'item_name', 'measurement_unit',
         'avg_base_price', 'selling_price', 'purchase_unit',
