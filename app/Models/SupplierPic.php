@@ -7,17 +7,17 @@ use Carbon\Carbon;
 
 class SupplierPic extends Model
 {
-    protected $table = 'supplier_pic'; // sesuaikan nama tabel
+    protected $table = 'supplier_pics'; // sesuaikan nama tabel
     protected $fillable = ['name', 'email', 'phone_number', 'supplier_id'];
     protected $primaryKey = 'id';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing = true; // ID is auto-increment
+    protected $keyType = 'int'; // ID is integer
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
-        $this->table = config('db_constants.table.supplier_pic');
+        $this->table = config('db_tables.supplier_pic');
         $this->fillable = array_values(config('db_constants.column.supplier_pic') ?? []);
     }
 
