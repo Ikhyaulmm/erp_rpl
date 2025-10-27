@@ -27,10 +27,10 @@ class Warehouse extends Model
     {
         $query = self::query();
         //perubahan pemanggilan
-        if ($search) {
-            $query->where($cols::NAME, 'LIKE', "%{$search}%")
-                  ->orWhere($cols::ADDRESS, 'LIKE', "%{$search}%")
-                  ->orWhere($cols::PHONE, 'LIKE', "%{$search}%");
+         if ($search) {
+            $query->where(WarehouseColumns::NAME, 'LIKE', "%{$search}%")
+                  ->orWhere(WarehouseColumns::ADDRESS, 'LIKE', "%{$search}%")
+                  ->orWhere(WarehouseColumns::PHONE, 'LIKE', "%{$search}%");
         }
 
         return $query->orderBy(WarehouseColumns::CREATED_AT, 'asc')->paginate(config('pagination.branch_per_page'));
