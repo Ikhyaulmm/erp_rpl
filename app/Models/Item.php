@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Exception;
@@ -8,7 +9,8 @@ use Exception;
 class Item extends Model
 {
     use HasFactory;
-    protected $table = 'item';
+
+    protected $table;
     protected $fillable = [
         'product_id', 'sku', 'item_name', 'measurement_unit',
         'avg_base_price', 'selling_price', 'purchase_unit',
@@ -19,21 +21,30 @@ class Item extends Model
     {
         parent::__construct($attributes);
 
-        $this->table = config('db_constants.table.item');
-        $this->fillable = array_values(config('db_constants.column.item') ?? []);
+        // Pakai konfigurasi tabel dari config/db_constants.php
+        $this->table = config('db_constants.table.item', 'items');
+        $this->fillable = array_values(config('db_constants.column.item') ?? $this->fillable);
     }
 
-    // Relasi berdasarkan sku
+    // Relasi berdasarkan SKU ke PurchaseOrderDetail
     public function purchaseOrderDetails()
     {
         return $this->hasMany(PurchaseOrderDetail::class, 'product_id', 'sku');
     }
 
+    // Relasi ke MeasurementUnit
+    public function unit()
+    {
+        return $this->belongsTo(MeasurementUnit::class, 'measurement_unit', 'id');
+    }
+
+    // Ambil semua item
     public function getItem()
     {
         return self::all();
     }
 
+    // Ambil semua item dengan pencarian opsional
     public static function getAllItems($search = null)
     {
         $query = self::with('unit');
@@ -42,7 +53,7 @@ class Item extends Model
             if (is_numeric($search)) {
                 $query->where('id', '=', $search);
             } else {
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('item_name', 'LIKE', "%{$search}%")
                       ->orWhere('sku', 'LIKE', "%{$search}%");
                 });
@@ -52,6 +63,7 @@ class Item extends Model
         return $query->orderBy('id', 'asc')->paginate(10);
     }
 
+    // Hapus item berdasarkan ID
     public static function deleteItemById($id)
     {
         $item = self::find($id);
@@ -60,7 +72,7 @@ class Item extends Model
             return false;
         }
 
-        // Cek relasi berdasarkan SKU
+        // Cek relasi dengan purchase order
         if ($item->purchaseOrderDetails()->exists()) {
             throw new Exception("Item tidak bisa dihapus karena sudah digunakan di purchase order.");
         }
@@ -71,66 +83,66 @@ class Item extends Model
         return true;
     }
 
-    public static function countItem() 
+    // Hitung total item
+    public static function countItem()
     {
         return self::count();
     }
 
+    // Update data item
     public static function updateItem($id, $data)
     {
         $item = self::find($id);
-    
+
         if (!$item) {
             return null;
         }
-    
+
         $item->update($data);
-    
         return $item;
-       }
+    }
 
-
+    // Tambah item baru
     public function addItem($data)
     {
         return self::create($data);
     }
 
-    public function unit()
+    // Ambil item berdasarkan ID
+    public static function getItemById($id)
     {
-        return $this->belongsTo(MeasurementUnit::class, 'measurement_unit', 'id');
-    }
-
-
-    public static function getItembyId($id){
         return self::where('id', $id)->first();
-
     }
 
-    public static function countItemByProductType(){
-        return self::count(); 
+    // Hitung item berdasarkan tipe produk (sementara masih count total)
+    public static function countItemByProductType()
+    {
+        return self::count();
     }
 
-    
+    // Ambil item berdasarkan tipe produk
     public static function getItemByType($productType)
     {
-        return self::join('products', 'item.product_id', '=', 'products.product_id')
+        return self::join('products', 'items.product_id', '=', 'products.product_id')
             ->where('products.product_type', $productType)
-            ->select('item.*', 'products.product_type', 'products.product_name')
+            ->select('items.*', 'products.product_type', 'products.product_name')
             ->get();
     }
 
+    // Cari item berdasarkan keyword
     public static function searchItem($keyword)
     {
         return self::where('item_name', 'like', '%' . $keyword . '%')->paginate(10);
     }
-    
+
+    // Ambil item berdasarkan kategori produk
     public static function getItemByCategory($categoryId)
     {
-        return self::join('products', 'item.product_id', '=', 'products.product_id')
+        return self::join('products', 'items.product_id', '=', 'products.product_id')
             ->join('category', 'products.product_category', '=', 'category.id')
             ->where('category.id', $categoryId)
             ->select(
-                'item.*',
+                'items.*',
                 'products.product_name',
                 'products.product_category',
                 'category.category as category_name'
@@ -138,9 +150,10 @@ class Item extends Model
             ->get();
     }
 
+    // Hitung jumlah item dalam kategori tertentu
     public static function countItemByCategory($categoryId)
     {
-        return self::join('products', 'item.product_id', '=', 'products.product_id')
+        return self::join('products', 'items.product_id', '=', 'products.product_id')
             ->join('category', 'products.product_category', '=', 'category.id')
             ->where('category.id', $categoryId)
             ->count();

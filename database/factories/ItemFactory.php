@@ -2,25 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\Item;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemFactory extends Factory
 {
-    protected $model = Item::class;
-
-    public function definition(): array
+    public function definition()
     {
         return [
-            'product_id' => 1,
-            'sku' => $this->faker->unique()->word(),
-            'item_name' => $this->faker->word(),
-            'measurement_unit' => 1,
-            'avg_base_price' => 10000,
+            'product_id'    => 'PROD',
+            'sku'           => 'SKU-' . $this->faker->unique()->numberBetween(1, 999),
+            'name'          => $this->faker->words(2, true),
+            'measurement'   => 'm',
+            'base_price'    => 10000,
             'selling_price' => 15000,
-            'purchase_unit' => 'box',
-            'sell_unit' => 'pcs',
-            'stock_unit' => 'pcs',
+            'purchase_unit' => 30,
+            'sell_unit'     => 30,
+            'stock_unit'    => 100,
         ];
     }
 }
