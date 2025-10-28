@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Constants\SupplierPicColumns;
 
 class SupplierPic extends Model
 {
-    protected $table = 'supplier_pic'; // sesuaikan nama tabel
+    protected $table; // akan diambil dari config
     protected $fillable = ['name', 'email', 'phone_number', 'supplier_id'];
     protected $primaryKey = 'id';
     public $incrementing = false;
@@ -16,9 +17,8 @@ class SupplierPic extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-
-        $this->table = config('db_constants.table.supplier_pic');
-        $this->fillable = array_values(config('db_constants.column.supplier_pic') ?? []);
+        $this->table = config('db_tables.supplier_pic');
+        $this->fillable = SupplierPicColumns::getFillable();
     }
 
     // method untuk ambil data berdasarkan ID
