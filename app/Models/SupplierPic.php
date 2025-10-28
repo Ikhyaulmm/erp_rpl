@@ -9,8 +9,7 @@ use App\Constants\SupplierPicColumns;
 class SupplierPic extends Model
 {
     protected $table; // akan diambil dari config
-    protected $fillable = ['name', 'email', 'phone_number', 'supplier_id'];
-    protected $primaryKey = 'id';
+    protected $fillable = [];
     public $incrementing = false;
     protected $keyType = 'string';
 
