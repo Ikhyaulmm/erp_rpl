@@ -10,12 +10,9 @@ use Exception;
 
 class Item extends Model
 {
-    protected $table = 'item';
-    protected $fillable = [
-        'product_id', 'sku', 'item_name', 'measurement_unit',
-        'avg_base_price', 'selling_price', 'purchase_unit',
-        'sell_unit', 'stock_unit'
-    ];
+    use HasFactory;
+    
+    protected $table;
 
     public function __construct(array $attributes = [])
     {
