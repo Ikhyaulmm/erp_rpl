@@ -10,19 +10,23 @@ use PHPUnit\Framework\Attributes\Test;
 
 class SearchWarehouseTest extends TestCase
 {
-    #[Test]
-    public function test_modelSearchWarehouse_returns_matching_results(): void
-    {
-        // Pastikan di database sudah ada warehouse_name: 'Gudang dolores'
-        $results = (new Warehouse)->searchWarehouse('dolores');
+#[Test]
+public function test_modelSearchWarehouse_returns_matching_results(): void
+{
+    // Tambah data contoh
+    Warehouse::create([
+        'warehouse_name' => 'Gudang dolores',
+        'warehouse_code' => 'GD001',
+        'warehouse_address' => 'Jl. Mawar No. 5',
+    ]);
 
-        // Periksa hasil tidak kosong
-        $this->assertNotEmpty($results, 'Search result should not be empty');
+    $results = (new Warehouse)->searchWarehouse('dolores');
 
-        // Periksa hasil mengandung data yang dicari
-        $this->assertTrue(
-            $results->pluck('warehouse_name')->contains('Gudang dolores'),
-            'Search result should contain warehouse with name "Gudang dolores"'
-        );
-    }
+    $this->assertNotEmpty($results, 'Search result should not be empty');
+    $this->assertTrue(
+        $results->pluck('warehouse_name')->contains('Gudang dolores'),
+        'Search result should contain warehouse with name "Gudang dolores"'
+    );
+}
+
 }
