@@ -119,7 +119,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian berdasarkan supplier_id
      * @test
      */
-    public function it_counts_supplier_material_by_supplier_id()
+    public function it_counts_supplier_material_found_by_supplier_id()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -149,7 +149,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian berdasarkan company_name
      * @test
      */
-    public function it_counts_supplier_material_by_company_name()
+    public function it_counts_supplier_material_found_by_company_name()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -179,7 +179,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian berdasarkan product_id
      * @test
      */
-    public function it_counts_supplier_material_by_product_id()
+    public function it_counts_supplier_material_found_by_product_id()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -209,7 +209,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian berdasarkan product_name
      * @test
      */
-    public function it_counts_supplier_material_by_product_name()
+    public function it_counts_supplier_material_found_by_product_name()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -247,7 +247,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian dengan keyword yang tidak ditemukan
      * @test
      */
-    public function it_counts_supplier_material_with_no_results()
+    public function it_counts_supplier_material_found_with_no_results()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -269,7 +269,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian dengan keyword kosong
      * @test
      */
-    public function it_counts_supplier_material_with_empty_keyword()
+    public function it_counts_supplier_material_found_with_empty_keyword()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -307,7 +307,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian dengan keyword partial match
      * @test
      */
-    public function it_counts_supplier_material_with_partial_keyword()
+    public function it_counts_supplier_material_found_with_partial_keyword()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -345,7 +345,7 @@ class SupplierMaterialTest extends TestCase
      * Test pencarian case insensitive
      * @test
      */
-    public function it_counts_supplier_material_case_insensitive()
+    public function it_counts_supplier_material_found_case_insensitive()
     {
         // Arrange
         SupplierMaterial::factory()->create([
@@ -367,7 +367,7 @@ class SupplierMaterialTest extends TestCase
      * Test dengan angka dalam keyword
      * @test
      */
-    public function it_counts_supplier_material_with_number_in_keyword()
+    public function it_counts_supplier_material_found_with_number_in_keyword()
     {
         // Arrange - buat 3 record, 2 mengandung "001"
         SupplierMaterial::factory()->create([
