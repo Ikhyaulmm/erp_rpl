@@ -314,5 +314,75 @@ class ItemTest extends BaseTestCase
         } catch (\Throwable $e) {
             $this->fail('getItem() should not throw an exception when table is empty');
         }
+
+    /**
+     * Test addItem method successfully creates and returns a new item
+     */
+    public function test_addItem_successfully_creates_and_returns_item()
+    {
+        // Arrange - Prepare item data (product_id must be exactly 4 characters)
+        $itemData = [
+            'sku' => 'ADD-001',
+            'name' => 'Test Item for Add',
+            'product_id' => 'PROD',
+            'measurement' => 1,
+            'base_price' => 20000,
+            'selling_price' => 25000,
+            'purchase_unit' => 50,
+            'sell_unit' => 50,
+            'stock_unit' => 200
+        ];
+
+        // Act - Create new item using addItem method
+        $item = new Item();
+        $createdItem = $item->addItem($itemData);
+
+        // Assert - Item should be created and returned
+        $this->assertInstanceOf(Item::class, $createdItem);
+        $this->assertEquals('ADD-001', $createdItem->sku);
+        $this->assertEquals('Test Item for Add', $createdItem->name);
+        $this->assertEquals('PROD', $createdItem->product_id);
+        $this->assertEquals(20000, $createdItem->base_price);
+        $this->assertEquals(25000, $createdItem->selling_price);
+
+        // Assert - Item exists in database
+        $this->assertDatabaseHas('items', [
+            'sku' => 'ADD-001',
+            'name' => 'Test Item for Add',
+            'product_id' => 'PROD'
+        ]);
+    }
+
+    /**
+     * Test addItem method creates item with minimal required data
+     */
+    public function test_addItem_creates_item_with_minimal_data()
+    {
+        // Arrange - Minimal item data (product_id and measurement are required)
+        $minimalData = [
+            'sku' => 'MIN-001',
+            'name' => 'Minimal Item',
+            'product_id' => 'PROD',
+            'measurement' => 1
+        ];
+
+        // Act - Create item
+        $item = new Item();
+        $createdItem = $item->addItem($minimalData);
+
+        // Assert - Item created successfully
+        $this->assertInstanceOf(Item::class, $createdItem);
+        $this->assertEquals('MIN-001', $createdItem->sku);
+        $this->assertEquals('Minimal Item', $createdItem->name);
+        $this->assertEquals('PROD', $createdItem->product_id);
+        $this->assertEquals(1, $createdItem->measurement);
+
+        // Assert - Exists in database
+        $this->assertDatabaseHas('items', [
+            'sku' => 'MIN-001',
+            'name' => 'Minimal Item',
+            'product_id' => 'PROD',
+            'measurement' => 1
+        ]);
     }
 }
