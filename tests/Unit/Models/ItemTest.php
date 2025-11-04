@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Item;
@@ -21,7 +22,7 @@ class ItemTest extends BaseTestCase
         parent::setUp();
         
         // Reset auto-increment untuk memastikan ID dimulai dari 1
-        \DB::statement('ALTER TABLE items AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE items AUTO_INCREMENT = 1');
     }
 
     // ========== DELETE ITEM BY ID METHOD TESTS ==========
