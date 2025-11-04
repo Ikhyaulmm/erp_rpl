@@ -314,6 +314,7 @@ class ItemTest extends BaseTestCase
         } catch (\Throwable $e) {
             $this->fail('getItem() should not throw an exception when table is empty');
         }
+    }
 
     /**
      * Test addItem method successfully creates and returns a new item
