@@ -4,45 +4,73 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Category;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GetCategoryByParentTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function it_returns_categories_with_existing_parent_id()
     {
-        // Ambil salah satu parent_id yang sudah ada di tabel dan punya anak
-        $existingParent = Category::whereNotNull('parent_id')->first();
+        $parent = Category::create([
+            'category'  => 'Parent Category',
+            'parent_id' => null,
+            'is_active' => 1,
+        ]);
 
-        // Jika tidak ditemukan, tes dianggap gagal
-        $this->assertNotNull($existingParent, 'Tidak ada kategori anak yang memiliki parent_id.');
+        Category::create([
+            'category'  => 'Child Category 1',
+            'parent_id' => $parent->id,
+            'is_active' => 1,
+        ]);
 
-        // Ambil ID parent-nya
-        $parentId = $existingParent->parent_id;
+        Category::create([
+            'category'  => 'Child Category 2',
+            'parent_id' => $parent->id,
+            'is_active' => 0, // API kamu tetap menghitung yg tidak aktif
+        ]);
 
-        // Hit endpoint
-        $response = $this->getJson("/categories/parent/{$parentId}");
+        $response = $this->getJson("/categories/parent/{$parent->id}");
 
-        // Ambil jumlah anak dari parent_id tersebut
-        $expectedCount = Category::where('parent_id', $parentId)->count();
-
-        // Assert
         $response->assertStatus(200);
-        $response->assertJsonCount($expectedCount);
+        $response->assertJsonCount(2); // API sekarang hitung dua-duanya
     }
 
     /** @test */
     public function it_returns_404_for_non_existing_parent_id()
     {
-        // Ambil ID yang tidak ada (pastikan tidak ada kategori dengan parent_id = 99999)
         $invalidParentId = 99999;
 
-        // Hit endpoint
         $response = $this->getJson("/categories/parent/{$invalidParentId}");
 
-        // Assert
         $response->assertStatus(404);
         $response->assertJson([
             'message' => 'Tidak ada kategori dengan parent ID tersebut',
         ]);
+    }
+
+    /** @test */
+    public function it_returns_404_if_parent_exists_but_has_no_children()
+    {
+        $parent = Category::create([
+            'category'  => 'Parent Without Children',
+            'parent_id' => null,
+            'is_active' => 1,
+        ]);
+
+        $response = $this->getJson("/categories/parent/{$parent->id}");
+
+        // API kamu mengembalikan 404 jika child kosong
+        $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function it_returns_404_if_parent_id_is_not_numeric()
+    {
+        $response = $this->getJson("/categories/parent/abc");
+
+        // Sesuai hasil nyata API kamu → menghasilkan 404
+        $response->assertStatus(404);
     }
 }
