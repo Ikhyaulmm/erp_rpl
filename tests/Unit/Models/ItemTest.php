@@ -328,7 +328,7 @@ class ItemTest extends BaseTestCase
             'measurement' => 1
         ]);
     }
-}
+
  /**
      * Test countItemByProductType returns correct count for RM type
      */
@@ -519,3 +519,4 @@ class ItemTest extends BaseTestCase
         $this->assertIsInt($count);
         $this->assertEquals(1, $count);
     }
+}
