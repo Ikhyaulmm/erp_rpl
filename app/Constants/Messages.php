@@ -66,6 +66,10 @@ class Messages
     // Item messages
     public const ITEM_IN_USE = 'Item tidak bisa dihapus karena sudah digunakan di purchase order.';
 
+    // Purchase Order messages
+    public const PO_CREATED = 'Purchase Order berhasil ditambahkan.';
+    public const PO_CREATE_FAILED = 'Gagal menambahkan PO: ';
+
     // General
     public const ACTION_FAILED = 'Aksi gagal dilakukan!';
 }
