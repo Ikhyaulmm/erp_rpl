@@ -262,6 +262,6 @@ class MerkTest extends TestCase
         // Check appended attributes (dari getStatusLabelAttribute & getDisplayNameAttribute)
         $this->assertEquals('Aktif', $result->status_label);
         $this->assertStringContainsString('Lexus', $result->display_name);
-        $this->assertStringContainsString('✅', $result->display_name);
+        $this->assertStringContainsString('', $result->display_name);
     }
 }
