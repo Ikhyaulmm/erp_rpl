@@ -236,7 +236,7 @@ class ItemTest extends BaseTestCase
             'name' => 'Item to Delete',
             'base_price' => 5000
         ]);
-        
+
         $item2 = Item::factory()->create([
             'sku' => 'PRESERVE-002',
             'name' => 'Item to Keep',
@@ -248,12 +248,84 @@ class ItemTest extends BaseTestCase
 
         // Assert - Deletion successful and data integrity preserved
         $this->assertTrue($result);
-        
+
         // Check remaining item data integrity
         $remainingItem = Item::where('sku', 'PRESERVE-002')->first();
         $this->assertNotNull($remainingItem);
         $this->assertEquals('Item to Keep', $remainingItem->name);
         $this->assertEquals(10000, $remainingItem->base_price);
         $this->assertEquals('PRESERVE-002', $remainingItem->sku);
+    }
+
+
+    /**
+     * Test addItem method successfully creates and returns a new item
+     */
+    public function test_addItem_successfully_creates_and_returns_item()
+    {
+        // Arrange - Prepare item data (product_id must be exactly 4 characters)
+        $itemData = [
+            'sku' => 'ADD-001',
+            'name' => 'Test Item for Add',
+            'product_id' => 'PROD',
+            'measurement' => 1,
+            'base_price' => 20000,
+            'selling_price' => 25000,
+            'purchase_unit' => 50,
+            'sell_unit' => 50,
+            'stock_unit' => 200
+        ];
+
+        // Act - Create new item using addItem method
+        $item = new Item();
+        $createdItem = $item->addItem($itemData);
+
+        // Assert - Item should be created and returned
+        $this->assertInstanceOf(Item::class, $createdItem);
+        $this->assertEquals('ADD-001', $createdItem->sku);
+        $this->assertEquals('Test Item for Add', $createdItem->name);
+        $this->assertEquals('PROD', $createdItem->product_id);
+        $this->assertEquals(20000, $createdItem->base_price);
+        $this->assertEquals(25000, $createdItem->selling_price);
+
+        // Assert - Item exists in database
+        $this->assertDatabaseHas('items', [
+            'sku' => 'ADD-001',
+            'name' => 'Test Item for Add',
+            'product_id' => 'PROD'
+        ]);
+    }
+
+    /**
+     * Test addItem method creates item with minimal required data
+     */
+    public function test_addItem_creates_item_with_minimal_data()
+    {
+        // Arrange - Minimal item data (product_id and measurement are required)
+        $minimalData = [
+            'sku' => 'MIN-001',
+            'name' => 'Minimal Item',
+            'product_id' => 'PROD',
+            'measurement' => 1
+        ];
+
+        // Act - Create item
+        $item = new Item();
+        $createdItem = $item->addItem($minimalData);
+
+        // Assert - Item created successfully
+        $this->assertInstanceOf(Item::class, $createdItem);
+        $this->assertEquals('MIN-001', $createdItem->sku);
+        $this->assertEquals('Minimal Item', $createdItem->name);
+        $this->assertEquals('PROD', $createdItem->product_id);
+        $this->assertEquals(1, $createdItem->measurement);
+
+        // Assert - Exists in database
+        $this->assertDatabaseHas('items', [
+            'sku' => 'MIN-001',
+            'name' => 'Minimal Item',
+            'product_id' => 'PROD',
+            'measurement' => 1
+        ]);
     }
 }
