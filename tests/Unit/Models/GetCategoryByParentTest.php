@@ -28,13 +28,13 @@ class GetCategoryByParentTest extends TestCase
         Category::create([
             'category'  => 'Child Category 2',
             'parent_id' => $parent->id,
-            'is_active' => 0, // API kamu tetap menghitung yg tidak aktif
+            'is_active' => 0, 
         ]);
 
         $response = $this->getJson("/categories/parent/{$parent->id}");
 
         $response->assertStatus(200);
-        $response->assertJsonCount(2); // API sekarang hitung dua-duanya
+        $response->assertJsonCount(2); 
     }
 
     /** @test */
@@ -61,7 +61,6 @@ class GetCategoryByParentTest extends TestCase
 
         $response = $this->getJson("/categories/parent/{$parent->id}");
 
-        // API kamu mengembalikan 404 jika child kosong
         $response->assertStatus(404);
     }
 
@@ -70,7 +69,7 @@ class GetCategoryByParentTest extends TestCase
     {
         $response = $this->getJson("/categories/parent/abc");
 
-        // Sesuai hasil nyata API kamu → menghasilkan 404
+      
         $response->assertStatus(404);
     }
 }
