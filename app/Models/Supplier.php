@@ -16,7 +16,9 @@ class Supplier extends Model
      */
     public static function getSupplier()
     {
-        $supplierTable = config('db_constants.table.supplier');
+        // $supplierTable = config('db_constants.table.supplier');
+        $model = new self;
+        $supplierTable = $model->getTable();
         $poTable = config('db_constants.table.po');
 
         // Ambil semua kolom supplier + frekuensi order
