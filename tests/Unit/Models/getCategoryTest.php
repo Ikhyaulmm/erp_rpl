@@ -8,6 +8,8 @@ use App\Models\Category;
 use App\Constants\CategoryColumns;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+//pengetesan 
+
 class GetCategoryTest extends TestCase
 {
     use RefreshDatabase;
@@ -17,7 +19,6 @@ class GetCategoryTest extends TestCase
         parent::setUp();
         $this->artisan('migrate');
     }
-
     /**
      * Test getCategory() returns all categories with parent relationship
      */
