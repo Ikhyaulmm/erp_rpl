@@ -74,3 +74,4 @@ class UpdateCategory_Test extends TestCase
         $this->assertFalse(isset($updatedCategory->invalid_field));
     }
 }
+
