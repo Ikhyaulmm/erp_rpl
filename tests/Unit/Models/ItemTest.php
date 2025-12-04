@@ -386,4 +386,195 @@ class ItemTest extends BaseTestCase
             'measurement' => 1
         ]);
     }
+
+ /**
+     * Test countItemByProductType returns correct count for RM type
+     */
+    public function test_countItemByProductType_returns_correct_count_for_rm_type()
+    {
+        // Arrange - Create products with different types (4 char product_id)
+        $productRM1 = Product::factory()->create([
+            'product_id' => 'RM01',
+            'type' => 'RM'
+        ]);
+
+        $productRM2 = Product::factory()->create([
+            'product_id' => 'RM02',
+            'type' => 'RM'
+        ]);
+
+        $productFG = Product::factory()->create([
+            'product_id' => 'FG01',
+            'type' => 'FG'
+        ]);
+
+        // Create items for each product
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-001']);
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-002']);
+        Item::factory()->create(['product_id' => 'RM02', 'sku' => 'RM02-001']);
+        Item::factory()->create(['product_id' => 'FG01', 'sku' => 'FG01-001']);
+
+        // Act
+        $count = Item::countItemByProductType('RM');
+
+        // Assert - Should count only RM items (3 items)
+        $this->assertEquals(3, $count);
+    }
+
+    /**
+     * Test countItemByProductType returns correct count for FG type
+     */
+    public function test_countItemByProductType_returns_correct_count_for_fg_type()
+    {
+        // Arrange
+        $productRM = Product::factory()->create([
+            'product_id' => 'RM01',
+            'type' => 'RM'
+        ]);
+
+        $productFG1 = Product::factory()->create([
+            'product_id' => 'FG01',
+            'type' => 'FG'
+        ]);
+
+        $productFG2 = Product::factory()->create([
+            'product_id' => 'FG02',
+            'type' => 'FG'
+        ]);
+
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-001']);
+        Item::factory()->create(['product_id' => 'FG01', 'sku' => 'FG01-001']);
+        Item::factory()->create(['product_id' => 'FG02', 'sku' => 'FG02-001']);
+        Item::factory()->create(['product_id' => 'FG02', 'sku' => 'FG02-002']);
+
+        // Act
+        $count = Item::countItemByProductType('FG');
+
+        // Assert - Should count only FG items (3 items)
+        $this->assertEquals(3, $count);
+    }
+
+    /**
+     * Test countItemByProductType returns zero when no items exist for type
+     */
+    public function test_countItemByProductType_returns_zero_when_no_items_exist()
+    {
+        // Arrange - Create only RM products
+        $productRM = Product::factory()->create([
+            'product_id' => 'RM01',
+            'type' => 'RM'
+        ]);
+
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-001']);
+
+        // Act - Count for FG (which has no items)
+        $count = Item::countItemByProductType('FG');
+
+        // Assert
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * Test countItemByProductType returns zero when table is empty
+     */
+    public function test_countItemByProductType_returns_zero_when_table_is_empty()
+    {
+        // Arrange - No products or items created
+
+        // Act
+        $count = Item::countItemByProductType('RM');
+
+        // Assert
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * Test countItemByProductType with multiple items per product
+     */
+    public function test_countItemByProductType_counts_multiple_items_per_product()
+    {
+        // Arrange
+        $productRM = Product::factory()->create([
+            'product_id' => 'RM01',
+            'type' => 'RM'
+        ]);
+
+        // Create 5 items for the same RM product
+        for ($i = 1; $i <= 5; $i++) {
+            Item::factory()->create([
+                'product_id' => 'RM01',
+                'sku' => "RM01-00{$i}"
+            ]);
+        }
+
+        // Act
+        $count = Item::countItemByProductType('RM');
+
+        // Assert
+        $this->assertEquals(5, $count);
+    }
+
+    /**
+     * Test countItemByProductType with mixed product types
+     */
+    public function test_countItemByProductType_handles_mixed_product_types()
+    {
+        // Arrange - Only use valid enum values: RM and FG
+        $productRM1 = Product::factory()->create(['product_id' => 'RM01', 'type' => 'RM']);
+        $productRM2 = Product::factory()->create(['product_id' => 'RM02', 'type' => 'RM']);
+        $productFG1 = Product::factory()->create(['product_id' => 'FG01', 'type' => 'FG']);
+        $productFG2 = Product::factory()->create(['product_id' => 'FG02', 'type' => 'FG']);
+
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-001']);
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-002']);
+        Item::factory()->create(['product_id' => 'RM02', 'sku' => 'RM02-001']);
+        Item::factory()->create(['product_id' => 'FG01', 'sku' => 'FG01-001']);
+        Item::factory()->create(['product_id' => 'FG02', 'sku' => 'FG02-001']);
+        Item::factory()->create(['product_id' => 'FG02', 'sku' => 'FG02-002']);
+
+        // Act & Assert
+        $this->assertEquals(3, Item::countItemByProductType('RM'));
+        $this->assertEquals(3, Item::countItemByProductType('FG'));
+    }
+
+    /**
+     * Test countItemByProductType with invalid/non-existent product type
+     */
+    public function test_countItemByProductType_handles_invalid_product_type()
+    {
+        // Arrange
+        $productRM = Product::factory()->create([
+            'product_id' => 'RM01',
+            'type' => 'RM'
+        ]);
+
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-001']);
+
+        // Act - Search with invalid type
+        $count = Item::countItemByProductType('INVALID');
+
+        // Assert
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * Test countItemByProductType returns integer
+     */
+    public function test_countItemByProductType_returns_integer()
+    {
+        // Arrange
+        $productRM = Product::factory()->create([
+            'product_id' => 'RM01',
+            'type' => 'RM'
+        ]);
+
+        Item::factory()->create(['product_id' => 'RM01', 'sku' => 'RM01-001']);
+
+        // Act
+        $count = Item::countItemByProductType('RM');
+
+        // Assert - Check return type
+        $this->assertIsInt($count);
+        $this->assertEquals(1, $count);
+    }
 }

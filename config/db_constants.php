@@ -34,7 +34,7 @@ return [
         'supplier_pic'              => 'supplier_pic',
         'supplier_product'          => 'supplier_product',
         'unit'                      => 'item_unit',
-        'whouse'                    => 'warehouse'
+        'whouse'                    => 'warehouses'
     ],
     'column' => [
         'bom' => [
