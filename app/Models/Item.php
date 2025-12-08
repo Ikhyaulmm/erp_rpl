@@ -108,8 +108,11 @@ class Item extends Model
 
     }
 
-    public static function countItemByProductType(){
-        return self::count(); 
+    public static function countItemByProductType($productType)
+    {
+        return self::join('products', 'items.product_id', '=', 'products.product_id')
+            ->where('products.type', $productType)
+            ->count();
     }
 
     
