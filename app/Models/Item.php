@@ -19,10 +19,10 @@ class Item extends Model
     {
         parent::__construct($attributes);
 
-        // Gunakan konfigurasi tabel dari config, default ke 'items'
-        $this->table = config('db_constants.table.item', 'items');
-
-        // Gunakan kolom fillable dari konstanta ItemColumns
+        // Use table name from config
+        $this->table = config('db_tables.item', 'items');
+        
+        // Use fillable columns from ItemColumns constant
         $this->fillable = ItemColumns::getFillable();
     }
 
