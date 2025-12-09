@@ -10,7 +10,7 @@ use Tests\TestCase;
 /**
  * Feature tests for WarehouseController.
  */
-class WarehouseControllerTest extends TestCase
+class SearchWarehouseControllerTest extends TestCase
 {
     use RefreshDatabase;
 
