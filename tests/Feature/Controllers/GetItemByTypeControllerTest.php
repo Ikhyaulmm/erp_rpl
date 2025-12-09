@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class ItemControllerTest extends TestCase
+class GetItemByTypeControllerTest extends TestCase
 {
     use RefreshDatabase;
 
