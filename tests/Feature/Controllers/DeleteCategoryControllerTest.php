@@ -9,7 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Constants\Messages;
 
-class CategoryControllerTest extends TestCase
+class DeleteCategoryControllerTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
