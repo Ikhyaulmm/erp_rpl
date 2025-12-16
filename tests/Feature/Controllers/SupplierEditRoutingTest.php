@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\RefreshDatabase; // Ganti DatabaseTransactions dengan RefreshDatabase
 use Tests\TestCase;
