@@ -1087,4 +1087,139 @@ class PurchaseOrderControllerTest extends TestCase
         $this->assertEquals('PO2', $purchaseOrders[0]->po_number); // 2024-01-20
         $this->assertEquals('PO1', $purchaseOrders[1]->po_number); // 2024-01-10
     }
+
+    /**
+     * Test 1: Mencari berdasarkan PO Number (Happy Path)
+     */
+    public function test_search_purchase_order_by_po_number()
+    {
+        // Arrange
+        $supplier = $this->createSupplier(['supplier_id' => 'SUP010']);
+        
+        $targetPO = $this->createPurchaseOrder([
+            'po_number' => 'PO0010',
+            'supplier_id' => $supplier->supplier_id
+        ]);
+        
+        $otherPO = $this->createPurchaseOrder([
+            'po_number' => 'PO0099',
+            'supplier_id' => $supplier->supplier_id
+        ]);
+
+        // Act
+        // REVISI: Menggunakan URL manual '/purchase-orders/search' agar sama gayanya dengan '/purchase_orders/add'
+        $response = $this->get('/purchase-orders/search?keyword=PO0010');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewIs('purchase_orders.list');
+        
+        $response->assertViewHas('purchaseOrders', function ($purchaseOrders) use ($targetPO) {
+            return $purchaseOrders->contains('po_number', $targetPO->po_number) 
+                && $purchaseOrders->count() === 1;
+        });
+
+        $response->assertViewHas('keyword', 'PO0010');
+    }
+
+    /**
+     * Test 2: Mencari berdasarkan Nama Supplier (Relasi)
+     */
+    public function test_search_purchase_order_by_supplier_company_name()
+    {
+        // Arrange
+        $supplierA = $this->createSupplier(['supplier_id' => 'SUP02A', 'company_name' => 'PT Mencari Cinta']);
+        $supplierB = $this->createSupplier(['supplier_id' => 'SUP02B', 'company_name' => 'PT Yang Hilang']);
+
+        $poA = $this->createPurchaseOrder([
+            'po_number' => 'PO-A-1', 
+            'supplier_id' => $supplierA->supplier_id
+        ]);
+        
+        $poB = $this->createPurchaseOrder([
+            'po_number' => 'PO-B-1', 
+            'supplier_id' => $supplierB->supplier_id
+        ]);
+
+        // Act
+        // REVISI: URL Manual
+        $response = $this->get('/purchase-orders/search?keyword=Mencari Cinta');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewHas('purchaseOrders', function ($purchaseOrders) use ($poA) {
+            return $purchaseOrders->contains('po_number', $poA->po_number);
+        });
+        
+        $response->assertViewHas('purchaseOrders', function ($purchaseOrders) use ($poB) {
+            return !$purchaseOrders->contains('po_number', $poB->po_number);
+        });
+    }
+
+    /**
+     * Test 3: Mencari berdasarkan Status
+     */
+    public function test_search_purchase_order_by_status()
+    {
+        // Arrange
+        $supplier = $this->createSupplier(['supplier_id' => 'SUP030']);
+        
+        $this->createPurchaseOrder(['po_number' => 'PO-1', 'status' => 'Completed', 'supplier_id' => 'SUP030']);
+        $this->createPurchaseOrder(['po_number' => 'PO-2', 'status' => 'Cancelled', 'supplier_id' => 'SUP030']);
+
+        // Act
+        // REVISI: URL Manual
+        $response = $this->get('/purchase-orders/search?keyword=Completed');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewHas('purchaseOrders', function ($purchaseOrders) {
+            return $purchaseOrders->count() === 1 
+                && $purchaseOrders->first()->status === 'Completed';
+        });
+    }
+
+    /**
+     * Test 4: Tidak ada hasil (Empty State)
+     */
+    public function test_search_purchase_order_no_results()
+    {
+        // Arrange
+        $supplier = $this->createSupplier(['supplier_id' => 'SUP040']);
+        $this->createPurchaseOrder(['po_number' => 'PO0080', 'supplier_id' => 'SUP040']);
+
+        // Act
+        // REVISI: URL Manual
+        $response = $this->get('/purchase-orders/search?keyword=PO-GAIB');
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewHas('purchaseOrders', function ($purchaseOrders) {
+            return $purchaseOrders->isEmpty();
+        });
+    }
+
+    /**
+     * Test 5: Variable totalOrders harus menghitung SEMUA data (bukan hasil filter)
+     */
+    public function test_search_purchase_order_returns_correct_total_count()
+    {
+        // Arrange
+        $supplier = $this->createSupplier(['supplier_id' => 'SUP050']);
+        
+        $this->createPurchaseOrder(['po_number' => 'PO-1', 'supplier_id' => 'SUP050']);
+        $this->createPurchaseOrder(['po_number' => 'PO-2', 'supplier_id' => 'SUP050']);
+        $this->createPurchaseOrder(['po_number' => 'PO-3', 'supplier_id' => 'SUP050']);
+
+        // Act
+        // REVISI: URL Manual
+        $response = $this->get('/purchase-orders/search?keyword=PO-1');
+
+        // Assert
+        $response->assertViewHas('purchaseOrders', function ($pos) {
+            return $pos->count() === 1;
+        });
+
+        $response->assertViewHas('totalOrders', 3);
+    }
 }
