@@ -5,7 +5,6 @@ namespace Tests\Feature\Controllers;
 use Tests\TestCase;
 use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 class SupplierControllerTest extends TestCase
 {
     use RefreshDatabase;
@@ -115,5 +114,94 @@ class SupplierControllerTest extends TestCase
         $response->assertStatus(200)
                  ->assertJson(['status' => 'success'])
                  ->assertJsonCount(0, 'data');
+    }
+
+   /**
+     * Test method deleteSupplierByID berhasil menghapus supplier
+     */
+    public function test_deleteSupplierByID_can_delete_existing_supplier()
+    {
+        // Arrange: Buat data supplier
+        // FIX: supplier_id maksimal 6 karakter (SUP001)
+        $supplier = Supplier::factory()->create([
+            'supplier_id' => 'SUP001', 
+            'company_name' => 'PT Test Delete',
+            'address' => 'Jl. Delete No. 123',
+            'telephone' => '081234567890',
+            'bank_account' => '1234567890'
+        ]);
+
+        // Act: Hapus supplier
+        $response = $this->deleteJson("/supplier/delete/{$supplier->supplier_id}");
+
+        // Assert: Response berhasil
+        $response->assertStatus(200)
+                 ->assertJson([
+                     'status' => 'success',
+                     'message' => 'Supplier berhasil dihapus.'
+                 ]);
+
+        // Assert: Data terhapus dari database
+        $this->assertDatabaseMissing('suppliers', [
+            'supplier_id' => 'SUP001'
+        ]);
+    }
+
+    /**
+     * Test method deleteSupplierByID gagal jika ID tidak ditemukan
+     */
+    public function test_deleteSupplierByID_returns_404_when_supplier_not_found()
+    {
+        // Act: Coba hapus supplier yang tidak ada (Gunakan ID 6 digit acak)
+        $response = $this->deleteJson("/supplier/delete/ERR404");
+
+        // Assert: Response 404 Not Found
+        $response->assertStatus(404)
+                 ->assertJson([
+                     'status' => 'error',
+                     'message' => 'Supplier tidak ditemukan.'
+                 ]);
+    }
+
+    /**
+     * Test method deleteSupplierByID isolasi data (tidak menghapus data lain)
+     */
+    public function test_deleteSupplierByID_only_deletes_target_supplier()
+    {
+        // Arrange: Buat 3 supplier
+        // FIX: supplier_id disesuaikan jadi 6 karakter
+        $supplier1 = Supplier::factory()->create(['supplier_id' => 'ISO001']);
+        $supplier2 = Supplier::factory()->create(['supplier_id' => 'ISO002']);
+        $supplier3 = Supplier::factory()->create(['supplier_id' => 'ISO003']);
+
+        // Act: Hapus supplier kedua
+        $response = $this->deleteJson("/supplier/delete/ISO002");
+
+        // Assert: Response berhasil
+        $response->assertStatus(200);
+
+        // Assert: Hanya supplier kedua yang terhapus
+        $this->assertDatabaseMissing('suppliers', ['supplier_id' => 'ISO002']);
+        $this->assertDatabaseHas('suppliers', ['supplier_id' => 'ISO001']);
+        $this->assertDatabaseHas('suppliers', ['supplier_id' => 'ISO003']);
+    }
+
+    /**
+     * Test method deleteSupplierByID struktur JSON response
+     */
+    public function test_deleteSupplierByID_returns_correct_json_structure()
+    {
+        // Arrange: Buat supplier (Biarkan Factory yang generate ID 6 digit otomatis)
+        $supplier = Supplier::factory()->create();
+
+        // Act: Hapus supplier
+        $response = $this->deleteJson("/supplier/delete/{$supplier->supplier_id}");
+
+        // Assert: Response memiliki struktur yang benar
+        $response->assertStatus(200)
+                 ->assertJsonStructure([
+                     'status',
+                     'message'
+                 ]);
     }
 }
