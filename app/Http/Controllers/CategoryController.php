@@ -228,15 +228,16 @@ class CategoryController extends Controller
     //Search Category 
     public function searchCategory(Request $request)
     {
-        $keyword = $request->input('q');
+    // 1. Ganti 'q' jadi 'search' (sesuai name di input form blade)
+    $keyword = $request->input('search');
+    // 3. Ganti ->get() jadi ->paginate(10) (agar link pagination di view jalan)
+    $categories = Category::when($keyword, function ($query) use ($keyword) {
+        $query->where('category', 'like', '%' . $keyword . '%');
+    })->paginate(10); // Sesuaikan angka per halaman
 
-        $category = Category::when($keyword, function ($query) use ($keyword) {
-            $query->where('category', 'like', '%' . $keyword . '%');
-        })->get();
-
-        return view('category.list', compact('category'));
-    }
-
+    // Kirim variabel 'search' juga agar teks di kolom input tidak hilang setelah loading
+    return view('category.index', compact('categories', 'keyword'));
+    }   
 
     // delete category
     public function deleteCategory($id)
