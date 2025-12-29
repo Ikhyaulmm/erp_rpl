@@ -138,21 +138,18 @@ class Item extends Model
     // Ambil item berdasarkan kategori produk
     public static function getItemByCategory($categoryId)
     {
-        // Ambil nama tabel category dari config ('categories')
-        $categoryTable = config('db_tables.category', 'categories'); 
+        return self::query()
+        ->join('products', 'items.product_id', '=', 'products.product_id')
+        ->join('categories', 'products.category', '=', 'categories.id')
+        ->where('categories.id', $categoryId)
+        ->select(
+            'items.*',
+            'products.name as product_name',
+            'products.category',
+            'categories.category as category_name' 
+        )
+        ->get();
 
-        return self::join('products', 'items.' . ItemColumns::PROD_ID, '=', 'products.product_id')
-            // PERBAIKAN 1: Ubah 'products.product_category' menjadi 'products.category'
-            ->join($categoryTable, 'products.category', '=', $categoryTable . '.id')
-            ->where($categoryTable . '.id', $categoryId)
-            ->select(
-                'items.*',
-                'products.name as product_name', 
-                // PERBAIKAN 2: Select kolom yang benar
-                'products.category as product_category',
-                $categoryTable . '.category as category_name'
-            )
-            ->get();
     }
 
     // Hitung jumlah item dalam kategori tertentu
