@@ -43,7 +43,8 @@ class Product extends Model
 
     public static function getAllProducts()
     {
-        return self::withCount('items')->with('category')->selectRaw('(SELECT COUNT(*) FROM item WHERE item.sku LIKE CONCAT(products.product_id, "%")) AS items_count')->orderBy('created_at', 'desc')->paginate(10);
+        $tableItem = config('db_constants.table.item');
+        return self::withCount('items')->with('category')->selectRaw("(SELECT COUNT(*) FROM {$tableItem} WHERE {$tableItem}.sku LIKE CONCAT(products.product_id, \"%\")) AS items_count")->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function getSKURawMaterialItem()
