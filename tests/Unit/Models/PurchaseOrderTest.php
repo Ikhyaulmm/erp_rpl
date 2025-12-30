@@ -18,7 +18,6 @@ class PurchaseOrderTest extends TestCase
     // Jadi database asli kamu tidak akan kotor.
     use DatabaseTransactions;
 
-
     /**
      * @test
      * Menguji fungsi countPurchaseOrder() dengan banyak data.
@@ -172,8 +171,197 @@ class PurchaseOrderTest extends TestCase
         $this->assertCount(0, $result);
     }
 
+    // =========================================================================
+    //  TEST UNTUK FUNGSI: getPurchaseOrderByKeywords (KODE KAMU)
+    // =========================================================================
+
+    /**
+     * @test
+     * Test 1: getPurchaseOrderByKeywords tanpa keywords (return semua PO)
+     * Scenario: User tidak memberikan keyword, harusnya return semua purchase order
+     */
+    public function test_get_purchase_order_by_keywords_without_keywords()
+    {
+        // 1. ARRANGE (Persiapan Data)
+        $supplier = Supplier::factory()->create();
+
+        // Buat 3 purchase order
+        PurchaseOrder::create([
+            'po_number' => 'PO0001',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Draft',
+            'total' => 1000000,
+            'branch_id' => 1,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'PO0002',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Approved',
+            'total' => 2000000,
+            'branch_id' => 1,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'PO0003',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Received',
+            'total' => 3000000,
+            'branch_id' => 1,
+        ]);
+
+        // 2. ACT (Jalankan Fungsi)
+        $result = PurchaseOrder::getPurchaseOrderByKeywords(null);
+
+        // 3. ASSERT (Cek Hasil)
+        // Harusnya return minimal 3 purchase order
+        $this->assertGreaterThanOrEqual(3, $result->total());
+    }
+
+    /**
+     * @test
+     * Test 2: getPurchaseOrderByKeywords dengan search berdasarkan po_number
+     * Scenario: User search dengan po_number, harusnya return PO yang sesuai
+     */
+    public function test_get_purchase_order_by_keywords_search_by_po_number()
+    {
+        // 1. ARRANGE
+        $supplier = Supplier::factory()->create();
+
+        // Buat purchase order dengan po_number yang spesifik
+        PurchaseOrder::create([
+            'po_number' => 'PO9999',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Draft',
+            'total' => 5000000,
+            'branch_id' => 1,
+        ]);
+
+        // Buat PO lainnya yang tidak sesuai
+        PurchaseOrder::create([
+            'po_number' => 'PO0001',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Approved',
+            'total' => 1000000,
+            'branch_id' => 1,
+        ]);
+
+        // 2. ACT
+        $result = PurchaseOrder::getPurchaseOrderByKeywords('PO9999');
+
+        // 3. ASSERT
+        // Harusnya mengandung PO yang dicari
+        $poNumbers = $result->pluck('po_number')->toArray();
+        $this->assertContains('PO9999', $poNumbers);
+    }
+
+    /**
+     * @test
+     * Test 3: getPurchaseOrderByKeywords dengan search berdasarkan status
+     * Scenario: User search dengan status, harusnya return PO dengan status yang sesuai
+     */
+    public function test_get_purchase_order_by_keywords_search_by_status()
+    {
+        // 1. ARRANGE
+        $supplier = Supplier::factory()->create();
+
+        // Buat PO dengan status "Pending"
+        PurchaseOrder::create([
+            'po_number' => 'POT001',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Pending',
+            'total' => 1000000,
+            'branch_id' => 1,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'POT002',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Pending',
+            'total' => 2000000,
+            'branch_id' => 1,
+        ]);
+
+        // Buat PO dengan status "Approved"
+        PurchaseOrder::create([
+            'po_number' => 'POT003',
+            'supplier_id' => $supplier->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Approved',
+            'total' => 3000000,
+            'branch_id' => 1,
+        ]);
+
+        // 2. ACT
+        $result = PurchaseOrder::getPurchaseOrderByKeywords('Pending');
+
+        // 3. ASSERT
+        $this->assertGreaterThan(0, $result->total());
+        
+        // Verify ada yang mengandung "Pending"
+        $statuses = $result->pluck('status')->toArray();
+        $this->assertContains('Pending', $statuses);
+    }
+
+    /**
+     * @test
+     * Test 4: getPurchaseOrderByKeywords dengan search berdasarkan company_name supplier
+     * Scenario: User search dengan company_name supplier, harusnya return PO dari supplier tersebut
+     */
+    public function test_get_purchase_order_by_keywords_search_by_supplier_company_name()
+    {
+        // 1. ARRANGE
+        // Buat supplier dengan company_name yang spesifik
+        $supplierTarget = Supplier::factory()->create([
+            'company_name' => 'PT Maju Jaya Indonesia',
+        ]);
+
+        // Buat supplier lain
+        $supplierOther = Supplier::factory()->create([
+            'company_name' => 'CV Cinta Sejati',
+        ]);
+
+        // Buat PO dari supplier target
+        PurchaseOrder::create([
+            'po_number' => 'POS001',
+            'supplier_id' => $supplierTarget->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Draft',
+            'total' => 5000000,
+            'branch_id' => 1,
+        ]);
+
+        // Buat PO dari supplier lain
+        PurchaseOrder::create([
+            'po_number' => 'POS002',
+            'supplier_id' => $supplierOther->supplier_id,
+            'order_date' => now()->toDateString(),
+            'status' => 'Approved',
+            'total' => 2000000,
+            'branch_id' => 1,
+        ]);
+
+        // 2. ACT
+        // Search dengan company_name (gunakan kata kunci yang ada di nama)
+        $result = PurchaseOrder::getPurchaseOrderByKeywords('Maju Jaya');
+
+        // 3. ASSERT
+        $this->assertGreaterThan(0, $result->total());
+        
+        // Verify supplier_id ada di result
+        $supplierIds = $result->pluck('supplier_id')->toArray();
+        $this->assertContains($supplierTarget->supplier_id, $supplierIds);
+    }
+
     // =====================================================================
-    // KODE BARU (UNTUK FUNGSI countOrdersByDateSupplier)
+    // KODE BARU (UNTUK FUNGSI countOrdersByDateSupplier DARI TIM LAIN)
     // =====================================================================
 
     /**
