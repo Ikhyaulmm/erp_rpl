@@ -78,6 +78,11 @@ class SupplierController extends Controller
             'phone_number'   => 'required|string|max:20',
             'bank_account'   => 'required|string|max:255',
         ]);
+
+        // Map form input 'phone_number' to database column 'telephone'
+        $validatedData['telephone'] = $validatedData['phone_number'];
+        unset($validatedData['phone_number']);
+
         $supplier = Supplier::addSupplier($validatedData);
 
         return redirect()->back()->with('success', 'Supplier Berhasil Di Tambahkan');
