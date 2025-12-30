@@ -10,12 +10,12 @@ use App\Models\BillOfMaterial;
 
 class BomDetailTest extends DuskTestCase
 {
+
     use DatabaseTruncation;
 
     /**
      * Test menampilkan detail BOM dengan data lengkap
      * Test case ini verifikasi bahwa saat user klik "Lihat" detail BOM
-     * modal akan menampilkan informasi BOM dan detail komponennya dengan benar
      */
     public function test_display_bill_of_material_detail_successfully()
     {
