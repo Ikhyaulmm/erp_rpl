@@ -5,9 +5,6 @@ namespace Tests\Browser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
-use App\Models\User;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 
 class SupplierMaterialDatatablesTest extends DuskTestCase
@@ -15,84 +12,112 @@ class SupplierMaterialDatatablesTest extends DuskTestCase
     use DatabaseMigrations;
 
     /**
-     * Setup Database Manual (Mengakali Migration yang Hilang/Custom)
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // 1. Buat Tabel USERS (Darurat karena file migration user tidak ada )
-        if (!Schema::hasTable('users')) {
-            Schema::create('users', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->unique();
-                $table->timestamp('email_verified_at')->nullable();
-                $table->string('password');
-                $table->rememberToken();
-                $table->timestamps();
-            });
-        }
-
-        // 2. Buat Tabel SUPPLIER_PRODUCT (Sesuai file migration yang kamu kirim)
-        // Kita hardcode nama tabel 'supplier_product' agar aman
-        if (!Schema::hasTable('supplier_product')) {
-            Schema::create('supplier_product', function (Blueprint $table) {
-                $table->id();
-                $table->char('supplier_id', 6); // Sesuai migration kamu
-                $table->string('company_name', 100); // Ternyata nama PT ada di tabel ini juga
-                $table->char('product_id', 50);
-                $table->string('product_name', 50);
-                $table->integer('base_price');
-                $table->timestamps();
-            });
-        }
-    }
-
-    /**
-     * Skenario 1: Pastikan halaman bisa dibuka dan judulnya benar.
+     * TEST CASE 1: Verifikasi halaman bisa diakses dan data ditampilkan dengan benar
+     * - Mengecek title halaman
+     * - Mengecek struktur table headers
+     * - Mengecek data supplier material muncul di table
      */
     public function test_user_can_access_page()
     {
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                    // URL hardcoded sesuai href di sidebar blade kamu: /supplier/material/list
-                    ->visit('/supplier/material/list') 
-                    // Assert teks sesuai <h3 class="mb-0 me-2">Supplier Material</h3>
-                    ->assertSee('Supplier Material') 
-                    ->assertSee('List Table');
-        });
-    }
-
-    /**
-     * Skenario 2: Pastikan Data muncul di Tabel.
-     */
-    public function test_table_shows_data()
-    {
-        $user = User::factory()->create();
-
-        // Input Data Dummy Manual ke database
-        // Kita pakai DB::table agar tidak tergantung Model Factory yang mungkin belum ada
+        // Buat dummy data menggunakan DB::table (tanpa factory)
         DB::table('supplier_product')->insert([
             'supplier_id'   => 'SUP001',
-            'company_name'  => 'PT Mencari Cinta Sejati',
+            'company_name'  => 'PT Baja Indonesia Jaya',
             'product_id'    => 'PROD-01',
-            'product_name'  => 'Besi Beton Ulir',
+            'product_name'  => 'Besi Beton Ulir 10mm',
             'base_price'    => 50000,
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
 
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                    ->visit('/supplier/material/list')
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/supplier/material/list')
                     ->pause(1000)
-                    // Cek apakah data dummy tadi muncul di layar
-                    ->assertSee('PT Mencari Cinta Sejati')
-                    ->assertSee('Besi Beton Ulir')
+                    // Assert 1: Judul halaman benar
+                    ->assertSee('Supplier Material')
+                    ->assertSee('List Table')
+                    // Assert 2: Header table lengkap
+                    ->assertSee('supplier_id')
+                    ->assertSee('company_name')
+                    ->assertSee('product_name')
+                    ->assertSee('base_price')
+                    // Assert 3: Data supplier material muncul
+                    ->assertSee('SUP001')
+                    ->assertSee('PT Baja Indonesia Jaya')
+                    ->assertSee('Besi Beton Ulir 10mm')
                     ->assertSee('50000');
+        });
+    }
+
+    /**
+     * TEST CASE 2: Verifikasi multiple data dan action buttons berfungsi
+     * - Memastikan multiple rows ditampilkan dengan benar
+     * - Memastikan action buttons (Edit, Delete, Detail, Cetak PDF) ada
+     */
+    public function test_table_shows_data()
+    {
+        // Buat multiple data menggunakan DB::table
+        DB::table('supplier_product')->insert([
+            [
+                'supplier_id'   => 'SUP002',
+                'company_name'  => 'PT Semen Gresik',
+                'product_id'    => 'PROD-02',
+                'product_name'  => 'Semen Portland 50kg',
+                'base_price'    => 75000,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ],
+            [
+                'supplier_id'   => 'SUP003',
+                'company_name'  => 'PT Bata Merah',
+                'product_id'    => 'PROD-03',
+                'product_name'  => 'Bata Merah Premium',
+                'base_price'    => 2500,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ],
+        ]);
+
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/supplier/material/list')
+                    ->pause(1500)
+                    // Assert 1: Verifikasi data pertama muncul
+                    ->assertSee('PT Semen Gresik')
+                    ->assertSee('Semen Portland 50kg')
+                    ->assertSee('75000')
+                    // Assert 2: Verifikasi data kedua muncul
+                    ->assertSee('PT Bata Merah')
+                    ->assertSee('Bata Merah Premium')
+                    ->assertSee('2500')
+                    // Assert 3: Verifikasi action buttons ada
+                    ->assertSee('Edit')
+                    ->assertSee('Delete')
+                    ->assertSee('Detail')
+                    ->assertSee('Cetak PDF');
+        });
+    }
+
+    /**
+     * TEST CASE 3: Verifikasi form dan button navigasi berfungsi
+     * - Memastikan button "Tambah" ada
+     * - Memastikan page structure lengkap
+     */
+    public function test_add_button_and_navigation_visible()
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/supplier/material/list')
+                    ->pause(1000)
+                    // Assert 1: Heading ada
+                    ->assertSee('Supplier Material')
+                    // Assert 2: Tombol tambah ada
+                    ->assertSee('Tambah')
+                    // Assert 3: Table structure ada
+                    ->assertSee('List Table')
+                    ->assertSee('supplier_id')
+                    ->assertSee('company_name')
+                    ->assertSee('product_name')
+                    ->assertSee('base_price')
+                    ->assertSee('Action');
         });
     }
 }
