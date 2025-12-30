@@ -8,6 +8,9 @@ use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\PurchaseOrderDetail;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Enums\POStatus;
+use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 
 class PurchaseOrderTest extends TestCase
 {
@@ -83,7 +86,7 @@ class PurchaseOrderTest extends TestCase
     }
 
     // =========================================================================
-    //  TEST UNTUK FUNGSI: getReportBySupplierAndDate
+    //  TEST UNTUK FUNGSI: getReportBySupplierAndDate (DARI UTAMA/DEV)
     // =========================================================================
 
     /**
@@ -167,8 +170,9 @@ class PurchaseOrderTest extends TestCase
         // Harusnya kosong karena datanya bulan Mei, carinya Januari
         $this->assertCount(0, $result);
     }
+
     // =========================================================================
-    //  TEST UNTUK FUNGSI: getPurchaseOrderByKeywords
+    //  TEST UNTUK FUNGSI: getPurchaseOrderByKeywords (KODE KAMU)
     // =========================================================================
 
     /**
@@ -354,5 +358,113 @@ class PurchaseOrderTest extends TestCase
         // Verify supplier_id ada di result
         $supplierIds = $result->pluck('supplier_id')->toArray();
         $this->assertContains($supplierTarget->supplier_id, $supplierIds);
+    }
+
+    // =====================================================================
+    // KODE BARU (UNTUK FUNGSI countOrdersByDateSupplier DARI TIM LAIN)
+    // =====================================================================
+
+    /**
+     * Helper manual untuk membuat data dummy tanpa Factory.
+     * Format PO disesuaikan agar tidak error "Data too long".
+     */
+    private function createManualPurchaseOrder($overrides = [])
+    {
+        // Format PO pendek: PO + 3 digit angka (Contoh: PO123)
+        $poNumber = 'PO' . rand(100, 999); 
+
+        // Cek jika override punya po_number sendiri
+        if (isset($overrides['po_number'])) {
+            $poNumber = $overrides['po_number'];
+        }
+
+        DB::table('purchase_order')->insert(array_merge([
+            'po_number'   => $poNumber,
+            'supplier_id' => 'SUP001', // ID Supplier default untuk test ini
+            'branch_id'   => 1,
+            'order_date'  => '2024-01-15',
+            'total'       => 500000,
+            'status'      => POStatus::Draft->value,
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ], $overrides));
+    }
+
+    #[Test]
+    public function count_orders_logic_is_correct()
+    {
+        /** * Skenario 1: Logika Dasar & Filter Tanggal/Supplier
+         * Memastikan fungsi menghitung data yang valid dan mengabaikan yang tidak valid.
+         */
+        
+        // 1. Data VALID (Target) - Masuk hitungan
+        $this->createManualPurchaseOrder(['po_number' => 'PO101', 'supplier_id' => 'SUP-A', 'order_date' => '2024-01-10']); 
+        $this->createManualPurchaseOrder(['po_number' => 'PO102', 'supplier_id' => 'SUP-A', 'order_date' => '2024-01-20']);
+
+        // 2. Data INVALID (Tanggal Salah: Februari) - Jangan dihitung
+        $this->createManualPurchaseOrder(['po_number' => 'PO103', 'supplier_id' => 'SUP-A', 'order_date' => '2024-02-01']); 
+
+        // 3. Data INVALID (Supplier Salah: SUP-B) - Jangan dihitung
+        $this->createManualPurchaseOrder(['po_number' => 'PO104', 'supplier_id' => 'SUP-B', 'order_date' => '2024-01-15']); 
+
+        // ACT
+        $result = PurchaseOrder::countOrdersByDateSupplier(
+            '2024-01-01', 
+            '2024-01-31', 
+            'SUP-A'
+        );
+
+        // ASSERT
+        // Harusnya cuma 2 (Data VALID) yang terhitung
+        $this->assertEquals(2, $result, 'Gagal memfilter tanggal atau supplier dengan benar.');
+    }
+
+    #[Test]
+    public function count_orders_filters_by_status_enum_correctly()
+    {
+        /**
+         * Skenario 2: Filter Status (Enum)
+         * Memastikan parameter opsional status berfungsi.
+         */
+
+        // Buat 1 yang Approved (Target)
+        $this->createManualPurchaseOrder([
+            'po_number' => 'PO201',
+            'supplier_id' => 'SUP-A', 
+            'order_date' => '2024-01-15', 
+            'status' => POStatus::Approved->value
+        ]);
+
+        // Buat 1 yang Draft (Bukan Target)
+        $this->createManualPurchaseOrder([
+            'po_number' => 'PO202',
+            'supplier_id' => 'SUP-A', 
+            'order_date' => '2024-01-15', 
+            'status' => POStatus::Draft->value
+        ]);
+
+        // ACT (Cari yang Approved saja)
+        $result = PurchaseOrder::countOrdersByDateSupplier(
+            '2024-01-01', '2024-01-31', 'SUP-A', 
+            POStatus::Approved
+        );
+
+        // ASSERT
+        $this->assertEquals(1, $result, 'Gagal memfilter berdasarkan Status Enum.');
+    }
+
+    #[Test]
+    public function count_orders_returns_zero_on_empty_data()
+    {
+        /**
+         * Skenario 3: Data Kosong (Sad Path)
+         * Memastikan tidak error jika tidak ada data.
+         */
+        
+        $result = PurchaseOrder::countOrdersByDateSupplier(
+            '2024-01-01', '2024-01-31', 'SUP-Z'
+        );
+
+        $this->assertEquals(0, $result, 'Harusnya return 0 jika data kosong.');
     }
 }
