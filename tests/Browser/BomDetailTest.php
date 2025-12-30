@@ -2,168 +2,117 @@
 
 namespace Tests\Browser;
 
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
-use App\Models\User;
-use App\Models\Product;
-use App\Models\Item;
-use App\Models\Category;
 use App\Models\BillOfMaterial;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
 
 class BomDetailTest extends DuskTestCase
 {
-    protected $user;
-    protected $bomId;
+    use DatabaseTruncation;
 
     /**
-     * Setup data awal sebelum setiap test berjalan.
+     * Test menampilkan detail BOM dengan data lengkap
+     * Test case ini verifikasi bahwa saat user klik "Lihat" detail BOM
+     * modal akan menampilkan informasi BOM dan detail komponennya dengan benar
      */
-    protected function setUp(): void
+    public function test_display_bill_of_material_detail_successfully()
     {
-        parent::setUp();
-
-        // 1. Config Table Names sesuai context project
-        Config::set('db_tables.item', 'items');
-        Config::set('db_constants.table.bom', 'bill_of_material');
-        Config::set('db_constants.table.bom_detail', 'bom_detail');
-        Config::set('db_constants.table.products', 'products');
-        Config::set('db_table.category', 'categories');
-        Config::set('db_constants.table.mu', 'measurement_units');
-
-        // 2. Reset Database
-        $this->artisan('migrate:fresh');
-
-        // 3. Buat Tabel 'users' Manual jika belum ada (mengikuti pola SupplierPicTest)
-        if (!Schema::hasTable('users')) {
-            DB::statement('
-                CREATE TABLE users (
-                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(255) NOT NULL,
-                    email VARCHAR(255) NOT NULL UNIQUE,
-                    email_verified_at TIMESTAMP NULL,
-                    password VARCHAR(255) NOT NULL,
-                    remember_token VARCHAR(100) NULL,
-                    created_at TIMESTAMP NULL,
-                    updated_at TIMESTAMP NULL
-                )
-            ');
-        }
-
-        // 4. Buat User Admin untuk Login
-        $this->user = User::create([
-            'name' => 'Admin Test',
-            'email' => 'admin@erp.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        // 5. Setup Data Dummy (Product -> Item -> BOM -> BOM Detail)
-        
-        // Create Category (Required for Product)
-        $category = Category::create([
-            'category' => 'Bahan Baku',
-            'parent_id' => null,
-            'is_active' => 1,
-        ]);
-
-        // Create Product (Parent of Item) - Use Model to handle column mapping
-        Product::create([
-            'product_id' => 'P001', // Diubah menjadi 4 karakter sesuai batasan DB/Validasi
-            'name' => 'Tepung Terigu',
-            'type' => 'RM',
-            'category' => $category->id,
-            'description' => 'Bahan baku utama',
-        ]);
-
-        // Create Measurement Unit (Required for Item)
-        if (!Schema::hasTable('measurement_units')) {
-            DB::statement('CREATE TABLE measurement_units (
-                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                unit_name VARCHAR(50),
-                abbreviation VARCHAR(10),
-                created_at TIMESTAMP NULL,
-                updated_at TIMESTAMP NULL
-            )');
-        }
-
-        $unitId = DB::table('measurement_units')->insertGetId([
-            'unit_name' => 'Kilogram',
-            'abbreviation' => 'KG',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $pcsUnitId = DB::table('measurement_units')->insertGetId([
-            'unit_name' => 'Pieces',
-            'abbreviation' => 'PCS',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Create Item (Referenced by BOM Detail SKU)
-        Item::create([
-            'product_id' => 'P001', // Sesuaikan dengan product_id di atas
-            'sku' => 'ITEM-001',
-            'name' => 'Tepung Segitiga Biru', // Model uses 'name'
-            'measurement' => $unitId, // Model uses 'measurement' (Integer ID)
-            'avg_base_price' => 10000,
-            'selling_price' => 12000,
-            'purchase_unit' => $unitId, // Integer ID
-            'sell_unit' => $unitId,     // Integer ID
-            'stock_unit' => $unitId,    // Integer ID
-        ]);
-
-        // Create Bill of Material (Header)
+        // Setup: Buat data BOM untuk testing
         $bom = BillOfMaterial::create([
-            'bom_id' => 'BOM-001',
-            'bom_name' => 'Resep Roti Tawar',
-            'measurement_unit' => $pcsUnitId,
-            'total_cost' => 50000,
+            'bom_id' => 'BOM001',
+            'bom_name' => 'Produk A',
+            'measurement_unit' => 1,
+            'total_cost' => 200000,
             'active' => 1,
         ]);
-        $this->bomId = $bom->id;
 
-        // Create BOM Detail (Components)
-        DB::table('bom_detail')->insert([
-            'bom_id' => 'BOM-001', // Menggunakan string ID sesuai logika controller
-            'sku' => 'ITEM-001',
-            'quantity' => 5,
-            'cost' => 10000,
-            'created_at' => now(),
-            'updated_at' => now(),
+        // Insert detail BOM ke database
+        \DB::table('bom_detail')->insert([
+            [
+                'bom_id' => 'BOM001',
+                'sku' => 'SKU001',
+                'quantity' => 10,
+                'cost' => 50000,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'bom_id' => 'BOM001',
+                'sku' => 'SKU002',
+                'quantity' => 5,
+                'cost' => 100000,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
+
+        // Buka browser dan navigasi ke halaman list BOM
+        $this->browse(function (Browser $browser) use ($bom) {
+            $browser->visit('/bom/list')
+                    ->waitForText('Daftar Bill of Materials', 10)
+                    // Klik tombol "Lihat" untuk membuka detail BOM
+                    ->click("button[onclick*='getDetail(1)']")
+                    // Tunggu modal muncul dengan response dari API
+                    ->waitFor('#bomModal', 10)
+                    // Verifikasi judul modal
+                    ->assertSeeIn('#bomModalLabel', 'Detail Bill of Material')
+                    // Verifikasi data BOM ditampilkan dengan benar
+                    ->assertSeeIn('#bom_name', 'Produk A')
+                    // Verifikasi total cost ditampilkan
+                    ->assertSeeIn('#total_cost', 'Rp.')
+                    // Verifikasi status aktif
+                    ->assertSeeIn('#active_status', 'AKTIF')
+                    // Verifikasi tabel detail komponen ada
+                    ->assertPresent('#bom_details')
+                    // Verifikasi data detail BOM ditampilkan
+                    ->assertSeeIn('#bom_details', 'SKU001')
+                    ->assertSeeIn('#bom_details', 'SKU002');
+        });
     }
 
     /**
-     * Skenario: User login, buka list material (BOM), dan melihat detail BOM.
+     * Test verifikasi modal detail BOM menampilkan informasi dengan format benar
+     * Tes ini fokus pada struktur dan format data yang ditampilkan
      */
-   public function test_user_can_view_bom_detail()
+    public function test_bill_of_material_detail_shows_correct_format()
     {
-        $this->browse(function (Browser $browser) {
-            $browser->loginAs($this->user)
-                    // 1. Kunjungi halaman list BOM yang benar, yaitu /bom/list
-                    ->visit('/bom/list')
-                    ->assertSee('Daftar Bill of Materials') // Verifikasi bahwa kita ada di halaman yang benar
+        $bom = BillOfMaterial::create([
+            'bom_id' => 'BOM005',
+            'bom_name' => 'Produk Test',
+            'measurement_unit' => 2,
+            'total_cost' => 500000,
+            'active' => 1,
+        ]);
 
-                    // 2. Klik tombol "Lihat" yang sesuai.
-                    // Berdasarkan analisis file blade, tombolnya adalah <button> bukan <a>
-                    // dan tidak memiliki href. Kita akan klik tombol di baris pertama
-                    // karena data di view adalah statis.
-                    ->click('table.table-bordered tbody tr:first-child .btn-info')
+        \DB::table('bom_detail')->insert([
+            [
+                'bom_id' => 'BOM005',
+                'sku' => 'TEST-SKU-01',
+                'quantity' => 20,
+                'cost' => 500000,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
 
-                    // 3. Tunggu modal detail muncul dan validasi isinya.
-                    // Detail ditampilkan di dalam modal, bukan halaman baru.
-                    ->whenAvailable('.modal#bomModal', function ($modal) {
-                        $modal->assertSee('Detail Bill of Material')
-                              // Data di dalam modal di-fetch oleh JavaScript,
-                              // jadi kita bisa memvalidasi data dinamis yang kita buat di setup.
-                              ->waitForText('Resep Roti Tawar') // Tunggu teks dari AJAX call
-                              ->assertSee('Resep Roti Tawar')   // Nama BOM dari data setup
-                              ->assertSee('ITEM-001')           // SKU dari data setup
-                              ->assertSee('5');                // Quantity dari data setup
-                    });
+        $this->browse(function (Browser $browser) use ($bom) {
+            $browser->visit('/bom/list')
+                    ->waitForText('Daftar Bill of Materials', 10)
+                    ->click("button[onclick*='getDetail(1)']")
+                    ->waitFor('#bomModal', 10)
+                    // Verifikasi format currency Rp. ditampilkan
+                    ->assertSeeIn('#total_cost', 'Rp.')
+                    // Verifikasi detail table ada di dalam modal
+                    ->assertPresent('#bomModal table')
+                    // Verifikasi kolom header table
+                    ->assertSee('SKU')
+                    ->assertSee('Quantity')
+                    ->assertSee('Cost')
+                    // Verifikasi data detail BOM ditampilkan
+                    ->assertSeeIn('#bom_details', 'TEST-SKU-01')
+                    ->assertSeeIn('#bom_details', '20');
         });
     }
 }
