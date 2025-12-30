@@ -18,6 +18,12 @@ class MerkTest extends DuskTestCase
     {
         parent::setUp();
         $this->artisan('migrate', ['--env' => 'testing']);
+        
+        // Clean up merks table before each test
+        $tableName = config('db_tables.merk', 'merks');
+        Schema::disableForeignKeyConstraints();
+        DB::table($tableName)->truncate();
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
