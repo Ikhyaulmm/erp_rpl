@@ -76,6 +76,10 @@ class Messages
     public const SUPPLIER_PIC_DELETE_FAILED = 'PIC gagal dihapus.';
     public const SUPPLIER_PIC_DUPLICATE = 'Data PIC dengan informasi yang sama sudah ada dan tidak bisa disimpan.';
 
+    // Purchase Order messages
+    public const PO_CREATED = 'Purchase Order berhasil ditambahkan.';
+    public const PO_CREATE_FAILED = 'Gagal menambahkan PO: ';
+
     // General
     public const ACTION_FAILED = 'Aksi gagal dilakukan!';
 }

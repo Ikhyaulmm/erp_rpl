@@ -138,4 +138,82 @@ class CountStatusPOTest extends TestCase
             $this->assertEquals(1, $item->total);
         }
     }
+
+    // Additional Test Case 1: Count status PO with mixed suppliers and statuses
+    public function test_countStatusPO_with_mixed_suppliers_and_statuses()
+    {
+        // Arrange: Create POs with different suppliers and statuses
+        PurchaseOrder::create([
+            'po_number' => 'PO101',
+            'supplier_id' => 1,
+            'branch_id' => 1,
+            'order_date' => now(),
+            'total' => 1000,
+            'status' => POStatus::Draft->value,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'PO102',
+            'supplier_id' => 2,
+            'branch_id' => 1,
+            'order_date' => now(),
+            'total' => 2000,
+            'status' => POStatus::Draft->value,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'PO103',
+            'supplier_id' => 1,
+            'branch_id' => 1,
+            'order_date' => now(),
+            'total' => 3000,
+            'status' => POStatus::Approved->value,
+        ]);
+
+        // Act
+        $result = PurchaseOrder::countStatusPO();
+
+        // Assert
+        $this->assertEquals(2, $result[POStatus::Draft->value]->total);
+        $this->assertEquals(1, $result[POStatus::Approved->value]->total);
+    }
+
+    // Additional Test Case 2: Count status PO with only one status present
+    public function test_countStatusPO_with_only_one_status_present()
+    {
+        // Arrange: Create POs with only one status
+        PurchaseOrder::create([
+            'po_number' => 'PO201',
+            'supplier_id' => 1,
+            'branch_id' => 1,
+            'order_date' => now(),
+            'total' => 1000,
+            'status' => POStatus::Submitted->value,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'PO202',
+            'supplier_id' => 1,
+            'branch_id' => 1,
+            'order_date' => now(),
+            'total' => 2000,
+            'status' => POStatus::Submitted->value,
+        ]);
+
+        PurchaseOrder::create([
+            'po_number' => 'PO203',
+            'supplier_id' => 2,
+            'branch_id' => 1,
+            'order_date' => now(),
+            'total' => 3000,
+            'status' => POStatus::Submitted->value,
+        ]);
+
+        // Act
+        $result = PurchaseOrder::countStatusPO();
+
+        // Assert
+        $this->assertCount(1, $result);
+        $this->assertEquals(3, $result[POStatus::Submitted->value]->total);
+    }
 }
