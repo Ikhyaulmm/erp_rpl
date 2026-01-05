@@ -55,9 +55,14 @@ class PurchaseOrder extends Model
             ->paginate(10);
     }
 
-    public static function getPurchaseOrderByID($po_number)
+    public static function getPurchaseOrderByPo_Number($po_number)
     {
         return self::with('supplier', 'details')->orderBy('po_number')->where('po_number', $po_number)->paginate(10);
+    }
+
+    public static function getPurchaseOrderByID($id)
+    {
+        return self::find($id);
     }
 
     // Fungsi tambahan untuk menghitung jumlah item pada 1 PO
@@ -207,4 +212,25 @@ class PurchaseOrder extends Model
         }
         return $pendingDeliveries;
     }
+
+    public static function getPurchaseOrderByStatus($status)
+    {
+        return self::where('status', $status)->get();
+    }
+    public static function getPurchaseOrderBySupplierId($supplierId = null)
+    {
+        $query = self::with('supplier');
+
+        if ($supplierId) {
+        $query->where('supplier_id', $supplierId);
+        }
+
+        return $query->get();
+    }
+
+    public static function GetPOcountByStatus($status)
+    {
+        return self::where('status', $status)->count();
+    }
+
 }

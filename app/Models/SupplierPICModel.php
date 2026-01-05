@@ -3,10 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SupplierPICModel extends Model
 {
-    protected $table = 'supplier_pic';
+    use HasFactory;
+    
+    protected $table = 'supplier_pics';
+
+    protected $fillable = [
+        'supplier_id',
+        'name',
+        'phone_number',
+        'email',
+        'is_active',
+        'avatar',
+        'assigned_date',
+    ];
 
     // Tambahkan relasi ke model Supplier
     public function supplier()
@@ -31,4 +44,11 @@ class SupplierPICModel extends Model
 
         return $query->orderBy('created_at', 'asc')->paginate(10);
     }
+
+     public static function getSupplierPic($supplier_id)
+    {
+        return self::where('supplier_id', $supplier_id)
+                    ->paginate(10);
+    }
+
 }

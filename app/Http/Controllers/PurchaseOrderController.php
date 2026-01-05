@@ -7,13 +7,17 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Models\Supplier;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Constants\Messages;
 
 class PurchaseOrderController extends Controller
 {
     public function getPurchaseOrder()
     {
         $purchaseOrders = PurchaseOrder::getAllPurchaseOrders();
-        return view('purchase_orders.list', compact('purchaseOrders'));
+        $totalOrders = PurchaseOrder::countPurchaseOrder();
+        return view('purchase_orders.list', compact('purchaseOrders', 'totalOrders'));
     }
 
     public function getPurchaseOrderByID($po_number)
@@ -25,7 +29,8 @@ class PurchaseOrderController extends Controller
     {
         $keyword = request()->input('keyword');
         $purchaseOrders = PurchaseOrder::getPurchaseOrderByKeywords($keyword);
-        return view('purchase_orders.list', compact('purchaseOrders', 'keyword'));
+        $totalOrders = PurchaseOrder::countPurchaseOrder();
+        return view('purchase_orders.list', compact('purchaseOrders', 'keyword', 'totalOrders'));
     }
 
     // Menambahkan PO baru
@@ -60,9 +65,9 @@ class PurchaseOrderController extends Controller
 
         try {
             PurchaseOrder::addPurchaseOrder($allData);
-            return redirect()->back()->with('success', 'Purchase Order berhasil ditambahkan.');
+            return redirect()->back()->with('success', Messages::PO_CREATED);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menambahkan PO: ' . $e->getMessage());
+            return redirect()->back()->with('error', Messages::PO_CREATE_FAILED . $e->getMessage());
         }
     }
     public function getPOLength($poNumber, $orderDate) 
@@ -107,5 +112,36 @@ class PurchaseOrderController extends Controller
         $pdf = Pdf::loadView('purchase_orders.pdf_report', $data);
         return $pdf->stream('laporan_purchase_order_' . $supplier->company_name . '.pdf');
     }
+    public function getPurchaseOrderByStatus($status)
+    {
+        $purchaseOrders = \App\Models\PurchaseOrder::where('status', $status)
+                                      ->latest('order_date')
+                                      ->paginate(10);
 
+        $totalOrders = PurchaseOrder::where('status', $status)->count();
+        return view('purchase_orders.list', compact('purchaseOrders', 'status', 'totalOrders'));
+    }
+    public function sendMailPurchaseOrder(Request $request)
+    {
+        $data = $request->all();
+
+        if (empty($data['header']) || empty($data['items'])) {
+            return response()->json(['error' => 'Data tidak lengkap untuk mengirim email.'], 400);
+        }
+
+        try {
+            $emailTujuan = 'syah.ykm@gmail.com'; // Ganti dengan email Anda jika perlu
+            $dataUntukEmail = ['data' => $data];
+
+            Mail::send('purchase_orders.email', $dataUntukEmail, function ($message) use ($emailTujuan, $data) {
+                $message->to($emailTujuan)
+                        ->subject('Purchase Order Baru: ' . $data['header']['po_number']);
+            });
+
+            return response()->json(['success' => 'Email pesanan berhasil dikirim.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server gagal mengirim email: ' . $e->getMessage()], 500);
+        }
+    }
 }

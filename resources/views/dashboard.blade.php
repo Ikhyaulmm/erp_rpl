@@ -288,9 +288,21 @@
               </a>
             </li>
             <li class="nav-item">
+              <a href="{{ route('merks.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-tag-fill"></i>
+                <p>Merk</p>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="{{ route('product.list') }}" class="nav-link">
                 <i class="nav-icon bi bi-box-seam-fill"></i>
                 <p>Produk</p>
+              </a>
+            </li>
+             <li class="nav-item">
+              <a href="{{ route('warehouses.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-box2"></i>
+                <p>Warehouse</p>
               </a>
             </li>
             <li class="nav-item">
@@ -345,7 +357,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('branch.list') }}" class="nav-link">
+              <a href="{{ route('branches.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-clipboard-fill"></i>
                 <p>
                   Branch
@@ -357,6 +369,14 @@
                 <i class="nav-icon bi bi-clipboard-fill"></i>
                 <p>
                   Item
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('categories.index') }}" class="nav-link">
+                <i class="nav-icon bi bi-clipboard-fill"></i>
+                <p>
+                  Category
                 </p>
               </a>
             </li>
