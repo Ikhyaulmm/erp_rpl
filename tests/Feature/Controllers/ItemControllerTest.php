@@ -7,7 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-// Hapus: use Barryvdh\DomPDF\Facade\Pdf; (Kita tidak pakai Facade untuk Mocking lagi)
+
 
 class ItemControllerTest extends TestCase
 {
@@ -72,5 +72,80 @@ class ItemControllerTest extends TestCase
         // 3. ASSERT
         $response->assertRedirect();
         $response->assertSessionHas('error', 'Data tidak ditemukan untuk kategori ini.');
+    }
+    /**
+     * Test Skenario 3: getItemByCategory Berhasil (Data Ditemukan)
+     * Memastikan fungsi mengembalikan JSON response dengan data items dan status 200
+     */
+    public function test_get_item_by_category_returns_success_with_data()
+    {
+        // 1. ARRANGE (SIAPKAN DATA)
+        $category = Category::factory()->create([
+            'category' => 'Elektronik Rumah'
+        ]);
+
+        $product = Product::factory()->create([
+            'category' => $category->id,
+            'name' => 'Kulkas 2 Pintu'
+        ]);
+
+        Item::factory()->create([
+            'product_id' => $product->product_id,
+            'name' => 'Kulkas Sharp',
+            'sku' => 'SKU001'
+        ]);
+
+        // 2. ACT (JALANKAN ROUTE)
+        $response = $this->get("/items/category/{$category->id}");
+
+        // 3. ASSERT (CEK HASIL)
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true
+        ]);
+        // Pastikan response berisi data
+        $response->assertJsonStructure([
+            'success',
+            'data'
+        ]);
+    }
+
+    /**
+     * Test Skenario 4: getItemByCategory Gagal (Data Kosong)
+     * Memastikan fungsi mengembalikan JSON response dengan pesan error dan status 404
+     */
+    public function test_get_item_by_category_returns_error_if_data_empty()
+    {
+        // 1. ARRANGE (SIAPKAN DATA)
+        $category = Category::factory()->create([
+            'category' => 'Kategori Hantu'
+        ]);
+
+        // 2. ACT (JALANKAN ROUTE)
+        $response = $this->get("/items/category/{$category->id}");
+
+        // 3. ASSERT (CEK HASIL)
+        $response->assertStatus(404);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Data tidak ditemukan untuk kategori ini.'
+        ]);
+    }
+
+    /**
+     * Test Skenario 5: getItemByCategory dengan Category ID yang Tidak Ada
+     * Memastikan fungsi menangani category ID invalid dengan status 404
+     */
+    public function test_get_item_by_category_returns_error_with_nonexistent_category_id()
+    {
+        // 1. ACT (JALANKAN ROUTE dengan category ID yang tidak ada)
+        $response = $this->get("/items/category/999");
+
+        // 2. ASSERT (CEK HASIL)
+        $response->assertStatus(404);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Data tidak ditemukan untuk kategori ini.'
+        ]);
     }
 }
