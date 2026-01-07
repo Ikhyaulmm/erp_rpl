@@ -206,6 +206,7 @@ Route::post('/supplier-pic/update/{id}', [SupplierPIController::class, 'updateSu
 Route::get('/items', [ItemController::class, 'getItemAll']);
 Route::get('/item', [ItemController::class, 'getItemList'])->name('item.list'); // untuk tampilan
 Route::delete('/item/{id}', [ItemController::class, 'deleteItem'])->name('item.delete');
+Route::get('/items/category/{categoryId}', [ItemController::class, 'getItemByCategory']);
 
 Route::post('/item/add', [ItemController::class, 'store'])->name('item.add');
 Route::put('/item/update/{id}', [ItemController::class, 'updateItem']);
@@ -236,6 +237,7 @@ Route::delete('/supplier/delete/{id}', [SupplierController::class, 'deleteSuppli
 Route::get('/supplier-material/search', [SupplierMaterialController::class, 'searchSupplierMaterial'])->name('supplier.material.search');
 
 Route::get('/supplier/material/{id}', [SupplierMaterialController::class, 'getSupplierMaterialById'])->name('supplier.material.detail');
+Route::get('/supplier/print-pdf', [SupplierController::class, 'printPDF'])->name('supplier.print-pdf');
 Route::get('/suppliers/search', [SupplierController::class, 'searchSuppliers']);
 Route::get('/supplier-material/{supplier_id}/{product_type}', [SupplierMaterialController::class, 'getSupplierMaterialByProductType']);
 
