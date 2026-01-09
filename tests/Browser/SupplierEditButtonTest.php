@@ -268,25 +268,29 @@ class SupplierEditButtonTest extends DuskTestCase
      * Test 8: Form validation - Required fields cannot be empty
      */
     public function test_form_validation_required_fields(): void
-    {
-        // Create a test supplier
-        $supplier = Supplier::create([
-            'supplier_id' => 'SUP008',
-            'company_name' => 'PT Validation Test',
-            'address' => 'Jl. Validation Test',
-            'telephone' => '089012345678',
-            'bank_account' => '9012345678',
-        ]);
+{
+    // Create a test supplier
+    $supplier = Supplier::create([
+        'supplier_id' => 'SUP008',
+        'company_name' => 'PT Validation Test',
+        'address' => 'Jl. Validation Test',
+        'telephone' => '089012345678',
+        'bank_account' => '9012345678',
+    ]);
 
-        $this->browse(function (Browser $browser) use ($supplier) {
-            $browser->visit('/supplier/detail/' . $supplier->supplier_id)
-                ->pause(1000)
-                ->clear('company_name') // Clear required field
-                ->press('Update')
-                ->pause(1000);
-                // Form should stay on same page or show validation error
-        });
-    }
+    $this->browse(function (Browser $browser) use ($supplier) {
+        $browser->visit('/supplier/detail/' . $supplier->supplier_id)
+            ->pause(1000)
+            ->assertSee('Filled Form Supplier')
+            ->clear('company_name') // Clear required field
+            ->press('Update')
+            ->pause(500);
+            
+        // Assert form stays on same page (HTML5 validation prevents submit)
+        $browser->assertPathIs('/supplier/detail/' . $supplier->supplier_id)
+            ->assertPresent('input[name="company_name"]:invalid');
+    });
+}
 
     /**
      * Test 9: Multiple suppliers - Edit button works for each row
