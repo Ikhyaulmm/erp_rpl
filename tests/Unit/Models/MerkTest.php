@@ -530,13 +530,13 @@ class MerkTest extends TestCase
     // ========================================================================
 
     /**
-     * Test deleting an unused merk successfully
+     * Test deleting a merk successfully
      * Corresponds to TC-MK-19 from PRD (Happy Path)
      * @test
      */
-    public function test_it_can_delete_unused_merk_successfully()
+    public function test_it_can_delete_merk_successfully()
     {
-        // Arrange - Create a merk that has no relationships
+        // Arrange - Create a merk record
         $merk = Merk::factory()->create([
             MerkColumns::MERK => 'Test Brand',
             MerkColumns::IS_ACTIVE => true
