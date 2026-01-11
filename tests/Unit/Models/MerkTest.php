@@ -525,7 +525,9 @@ class MerkTest extends TestCase
     }
 
     // ========================================================================
-    // TEST UNTUK DELETE OPERATIONS
+    // TEST UNTUK DELETE OPERATIONS (Laravel Eloquent delete() on Merk model)
+    // These tests cover Laravel's built-in Eloquent delete() method on Merk instances,
+    // not a custom deleteMerkByID() method.
     // Based on PRD Test Cases TC-MK-19 to TC-MK-23
     // ========================================================================
 
