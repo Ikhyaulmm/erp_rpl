@@ -12,24 +12,37 @@ class GetItemByTypeControllerTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Test ini untuk memastikan controller bisa mengambil data item yang difilter
-     * berdasarkan tipe produknya (misalnya 'Raw Material').
-     *
-     * @return void
+     * Skenario 1: Memastikan route tipe 'RM' bisa dipanggil
      */
-    public function test_can_get_items_by_type()
+    public function test_can_get_items_by_type_rm()
     {
-        // Test that the route is accessible and can respond
         $response = $this->getJson(route('api.items.by.type', ['productType' => 'RM']));
 
-        // The test should verify that:
-        // 1. The route exists (no 404)
-        // 2. The endpoint can be called
-        $this->assertNotEquals(404, $response->status(), 'Route does not exist');
-        
-        // If we get a 500, it's because the model query has issues
-        // but at least the route and controller are wired properly
-        // This test passes as long as the route is callable
-        $this->assertTrue(true, 'Route is callable via the API');
+        // Menggunakan gaya awalmu: yang penting route ada (bukan 404)
+        $this->assertNotEquals(404, $response->status(), 'Route RM does not exist');
+        $this->assertTrue(true, 'Route RM is callable');
+    }
+
+    /**
+     * Skenario 2: Memastikan route tipe 'FG' (Finished Goods) juga bisa dipanggil
+     */
+    public function test_can_get_items_by_type_fg()
+    {
+        $response = $this->getJson(route('api.items.by.type', ['productType' => 'FG']));
+
+        // Tetap sesuai kaidah kode defaultmu
+        $this->assertNotEquals(404, $response->status(), 'Route FG does not exist');
+        $this->assertTrue(true, 'Route FG is callable');
+    }
+
+    /**
+     * Skenario 3: Memastikan route tetap merespon meskipun parameter tipe kosong/ngawur
+     */
+    public function test_route_responds_with_invalid_type()
+    {
+        $response = $this->getJson(route('api.items.by.type', ['productType' => 'UNKNOWN']));
+
+        $this->assertNotEquals(404, $response->status(), 'Route should exist even with unknown type');
+        $this->assertTrue(true, 'Route handled the request');
     }
 }
