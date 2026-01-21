@@ -87,6 +87,19 @@ public function test_getAllMerk_returns_paginated_results()
     $this->assertEquals('Honda', $searchResult[0]->merk);
 }
 
+public function test_getAllMerk_returns_empty_paginator_when_no_data()
+{
+    $result = Merk::getAllMerk();
+
+    $this->assertInstanceOf(
+        \Illuminate\Contracts\Pagination\LengthAwarePaginator::class,
+        $result
+    );
+
+    $this->assertEquals(0, $result->total());
+}
+
+
 
 
 
