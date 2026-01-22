@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class SupplierPICModel extends Model
 {
     use HasFactory;
-
     // Nama tabel di database
     protected $table = 'supplier_pic';
 
