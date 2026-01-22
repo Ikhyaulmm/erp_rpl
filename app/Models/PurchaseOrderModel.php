@@ -10,11 +10,8 @@ class PurchaseOrderModel extends Model
 {
     use HasFactory;
 
-    // 1. Tentukan Nama Tabel (Agar sinkron dengan Test)
-    // Kita gunakan config jika ada, atau default 'purchase_orders'
     protected $table = 'purchase_orders';
 
-    // 2. Daftar kolom yang bisa diisi
     protected $fillable = [
         'po_number', 
         'supplier_id', 
