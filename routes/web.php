@@ -19,11 +19,13 @@ use App\Http\Controllers\AssortProductionController;
 use App\Http\Controllers\BillOfMaterialController;
 use App\Http\Controllers\GoodsReceiptNoteController;
 use App\Models\BillOfMaterial;
+use App\Http\Controllers\ItemPdfController;
 
 // Route untuk cek hasil Supplier::getSupplier() (frekuensi order)
 Route::get('/cek-supplier-frekuensi', [App\Http\Controllers\SupplierController::class, 'getSupplierWithOrderFrequency']);
 
 
+Route::get('/item/pdf-report', [ItemPdfController::class, 'generatePDF']);
 
 # Route GET untuk form tambah merk
 Route::get('/merks/add', function () {
