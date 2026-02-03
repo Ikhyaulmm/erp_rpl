@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Models;
 
 use Tests\TestCase; // Gunakan Tests\TestCase agar bisa akses Helper Laravel
 use Illuminate\Foundation\Testing\RefreshDatabase;
