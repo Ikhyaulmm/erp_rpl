@@ -4,7 +4,7 @@ namespace Tests\Unit\Models;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\PurchaseOrder; 
+use App\Models\PurchaseOrder;
 
 class PurchaseOrderByIdTest extends TestCase
 {
@@ -14,22 +14,23 @@ class PurchaseOrderByIdTest extends TestCase
     public function it_can_get_purchase_order_by_id()
     {
         // 1. ARRANGE
-        $poNumber = 'PO001'; 
+        $poNumber = 'PO001';
         
         PurchaseOrder::create([
-            'po_number' => $poNumber,
+            'po_number'   => $poNumber,
             'supplier_id' => 'SUP001',
-            'total' => 150000,
-            'branch_id' => 1,
-            'order_date' => now(),
-            'status' => 'Pending',
+            'total'       => 150000,
+            'branch_id'   => 1,
+            'order_date'  => now(),
+            'status'      => 'Pending',
         ]);
 
         // 2. ACT
-        $result = PurchaseOrder::where('po_number', $poNumber)->first();
+        // Panggil static method langsung dari Class Model-nya
+        $result = PurchaseOrder::getPurchaseOrderByID($poNumber);
 
         // 3. ASSERT
-        $this->assertNotNull($result, 'Data Purchase Order harusnya ditemukan.');
+        $this->assertNotNull($result, 'Data harus ditemukan.');
         $this->assertEquals($poNumber, $result->po_number);
     }
 
@@ -38,18 +39,19 @@ class PurchaseOrderByIdTest extends TestCase
     {
         // 1. ARRANGE
         PurchaseOrder::create([
-            'po_number' => 'PO001', 
+            'po_number'   => 'PO001',
             'supplier_id' => 'SUP001',
-            'total' => 0,              // Tambahkan dummy data ini
-            'branch_id' => 1,          // Tambahkan dummy data ini
-            'order_date' => now(),     // Tambahkan dummy data ini
-            'status' => 'Pending',     // Tambahkan dummy data ini
+            'total'       => 0,
+            'branch_id'   => 1,
+            'order_date'  => now(),
+            'status'      => 'Pending',
         ]);
 
         // 2. ACT
-        $result = PurchaseOrder::where('po_number', 'PO999')->first();
+        // Cari ID yang tidak ada
+        $result = PurchaseOrder::getPurchaseOrderByID('PO999');
 
         // 3. ASSERT
-        $this->assertNull($result, 'Hasil harus null jika PO Number tidak ditemukan.');
+        $this->assertNull($result, 'Harus return null jika data tidak ditemukan.');
     }
 }

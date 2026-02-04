@@ -62,7 +62,7 @@ class PurchaseOrder extends Model
 
     public static function getPurchaseOrderByID($id)
     {
-        return self::find($id);
+        return self::where('po_number', $id)->first();
     }
 
     // Fungsi tambahan untuk menghitung jumlah item pada 1 PO
