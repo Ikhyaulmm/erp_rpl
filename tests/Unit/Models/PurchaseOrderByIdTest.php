@@ -4,49 +4,25 @@ namespace Tests\Unit\Models;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use App\Models\PurchaseOrder; 
 
 class PurchaseOrderByIdTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Schema::dropIfExists('purchase_order');
-        
-        Schema::create('purchase_order', function (Blueprint $table) {
-            $table->char('po_number', 6);
-            $table->char('supplier_id', 6);
-            
-            $table->bigInteger('total')->nullable();
-            $table->integer('branch_id')->nullable();
-            $table->date('order_date')->nullable();
-            $table->char('status', 20)->nullable();
-            
-            $table->timestamps();
-
-            $table->primary(['po_number', 'supplier_id']);
-        });
-    }
-
     /** @test */
     public function it_can_get_purchase_order_by_id()
     {
         // 1. ARRANGE
         $poNumber = 'PO001'; 
-        $supplierId = 'SUP001';
-
+        
         PurchaseOrder::create([
             'po_number' => $poNumber,
-            'supplier_id' => $supplierId,
+            'supplier_id' => 'SUP001',
             'total' => 150000,
             'branch_id' => 1,
-            'status' => 'Pending',
             'order_date' => now(),
+            'status' => 'Pending',
         ]);
 
         // 2. ACT
@@ -64,6 +40,10 @@ class PurchaseOrderByIdTest extends TestCase
         PurchaseOrder::create([
             'po_number' => 'PO001', 
             'supplier_id' => 'SUP001',
+            'total' => 0,              // Tambahkan dummy data ini
+            'branch_id' => 1,          // Tambahkan dummy data ini
+            'order_date' => now(),     // Tambahkan dummy data ini
+            'status' => 'Pending',     // Tambahkan dummy data ini
         ]);
 
         // 2. ACT
