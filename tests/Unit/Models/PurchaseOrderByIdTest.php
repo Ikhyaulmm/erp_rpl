@@ -26,7 +26,6 @@ class PurchaseOrderByIdTest extends TestCase
         ]);
 
         // 2. ACT
-        // Panggil static method langsung dari Class Model-nya
         $result = PurchaseOrder::getPurchaseOrderByID($poNumber);
 
         // 3. ASSERT
@@ -48,7 +47,6 @@ class PurchaseOrderByIdTest extends TestCase
         ]);
 
         // 2. ACT
-        // Cari ID yang tidak ada
         $result = PurchaseOrder::getPurchaseOrderByID('PO999');
 
         // 3. ASSERT

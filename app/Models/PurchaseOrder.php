@@ -10,6 +10,9 @@ use Carbon\Carbon;
 class PurchaseOrder extends Model
 {
     protected $table;
+    protected $primaryKey = 'po_number';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [];
 
     public function __construct(array $attributes = [])
@@ -62,7 +65,7 @@ class PurchaseOrder extends Model
 
     public static function getPurchaseOrderByID($id)
     {
-        return self::where('po_number', $id)->first();
+        return self::find($id);
     }
 
     // Fungsi tambahan untuk menghitung jumlah item pada 1 PO
