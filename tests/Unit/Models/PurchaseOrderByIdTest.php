@@ -16,36 +16,40 @@ class PurchaseOrderByIdTest extends TestCase
     {
         parent::setUp();
 
-        // FIX 1: Gunakan nama tabel 'purchase_order' (singular) sesuai error log
-        // Kita drop dulu tabelnya agar definisi kolom mengikuti yang kita buat di sini (bukan dari migrasi lama)
         Schema::dropIfExists('purchase_order');
         
-        // FIX 2: Buat tabel dengan nama 'purchase_order'
         Schema::create('purchase_order', function (Blueprint $table) {
-            $table->id();
-            // Definisi string tanpa angka akan default 255 karakter (cukup panjang)
-            $table->string('po_number')->unique(); 
-            $table->string('status')->nullable();
-            $table->date('date')->nullable();
+            $table->char('po_number', 6);
+            $table->char('supplier_id', 6);
             
-            // Tambahkan kolom timestamps (created_at, updated_at) agar tidak error saat insert
-            $table->timestamps(); 
+            $table->bigInteger('total')->nullable();
+            $table->integer('branch_id')->nullable();
+            $table->date('order_date')->nullable();
+            $table->char('status', 20)->nullable();
+            
+            $table->timestamps();
+
+            $table->primary(['po_number', 'supplier_id']);
         });
     }
 
     /** @test */
     public function it_can_get_purchase_order_by_id()
     {
-        // 1. ARRANGE: Gunakan data yang lebih pendek untuk keamanan
-        $poNumber = 'PO-001'; 
+        // 1. ARRANGE
+        $poNumber = 'PO001'; 
+        $supplierId = 'SUP001';
 
         PurchaseOrder::create([
             'po_number' => $poNumber,
+            'supplier_id' => $supplierId,
+            'total' => 150000,
+            'branch_id' => 1,
             'status' => 'Pending',
-            'date' => now(),
+            'order_date' => now(),
         ]);
 
-        // 2. ACT: Cari Data
+        // 2. ACT
         $result = PurchaseOrder::where('po_number', $poNumber)->first();
 
         // 3. ASSERT
@@ -56,13 +60,14 @@ class PurchaseOrderByIdTest extends TestCase
     /** @test */
     public function it_returns_null_if_po_number_not_found()
     {
-        // 1. ARRANGE: Buat data dummy
+        // 1. ARRANGE
         PurchaseOrder::create([
-            'po_number' => 'PO-001', 
+            'po_number' => 'PO001', 
+            'supplier_id' => 'SUP001',
         ]);
 
-        // 2. ACT: Cari ID yang Tidak Ada
-        $result = PurchaseOrder::where('po_number', 'PO-ZONK')->first();
+        // 2. ACT
+        $result = PurchaseOrder::where('po_number', 'PO999')->first();
 
         // 3. ASSERT
         $this->assertNull($result, 'Hasil harus null jika PO Number tidak ditemukan.');
