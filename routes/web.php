@@ -20,8 +20,6 @@ use App\Http\Controllers\BillOfMaterialController;
 use App\Http\Controllers\GoodsReceiptNoteController;
 use App\Models\BillOfMaterial;
 
-Route::put('/supplier-pic/update/{id}', [SupplierPIController::class, 'updateSupplierPICDetail']);
-
 // Route untuk cek hasil Supplier::getSupplier() (frekuensi order)
 Route::get('/cek-supplier-frekuensi', [App\Http\Controllers\SupplierController::class, 'getSupplierWithOrderFrequency']);
 
