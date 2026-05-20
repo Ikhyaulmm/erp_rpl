@@ -320,3 +320,5 @@ Route::get('/warehouse', [WarehouseController::class, 'getWarehouseAll'])->name(
 Route::get('/supplier-pic/{supplierID}', [SupplierPIController::class, 'getSupplierPIC']);
 
 Route::post('/supplier/add', [SupplierController::class, 'AddSuplier'])->name('supplier.add');
+
+Route::get('/bill-of-material/calculate/{id}', [App\Http\Controllers\BillOfMaterialController::class, 'calculateTotalCost'])->name('bom.calculate');
